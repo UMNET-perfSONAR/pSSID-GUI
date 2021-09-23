@@ -1,0 +1,22 @@
+version: '3.7'
+
+services:
+  web:
+    build: ./pSSIDGUI-root
+    container_name: django
+    command: gunicorn pSSIDGUI.wsgi:application --bind 0.0.0.0:8000
+    expose:
+      - 8000
+    env_file:
+      - ./.env
+    volumes:
+      - DIRECTORY
+      # includes ansible inventory
+  nginx:
+    build: ./nginx
+    volumes_from: 
+      - web
+    ports:
+      - 80:80
+    depends_on:
+      - web

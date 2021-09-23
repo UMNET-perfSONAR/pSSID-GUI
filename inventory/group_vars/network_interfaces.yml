@@ -1,0 +1,5 @@
+{
+    "future_network_interface_test": "wlan1",
+    "primary_network_interface": "wlan0",
+    "test": "wlan2"
+}

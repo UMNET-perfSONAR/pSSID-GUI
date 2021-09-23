@@ -1,0 +1,38 @@
+[
+            
+    {
+      "slot": "name",
+      "componentname": "custom-input",
+      "props": {
+        "title": "name",
+        "placeholder": "Name...",
+        "initvalue": null,
+        "label": "Name"
+      }
+    }
+  ,
+    {
+      "slot": "nodes",
+      "componentname": "node-picker",
+      "props": {
+        "title": "nodes",
+        "listData": ["name", "ip"],
+        "keyname": "ip",
+        "label": "Host"
+      },
+      "extraData": {"list": "hosts"}
+    }
+    ,
+    {
+      "slot": "tasks",
+      "componentname": "node-picker",
+      "props": {
+        "title": "tasks",
+        "listData": ["name", "schedule"],
+        "keyname": "name",
+        "label": "Tasks"
+      },
+      "extraData": {"list": "tasks"}
+    }
+  
+]

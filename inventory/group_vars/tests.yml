@@ -1,0 +1,70 @@
+{
+    "rtttest": {
+        "options": {
+            "Advanced-Groups": {
+                "fragment": "undefined",
+                "protocol": null
+            },
+            "Basic-Groups": {
+                "count": 56476574,
+                "dest": "test"
+            },
+            "Everything-Else": {
+                "deadline": null,
+                "flow-label": null,
+                "hostnames": "undefined",
+                "interval": null,
+                "iptos": null,
+                "ipversion": "",
+                "length": null,
+                "source": null,
+                "source-node": null,
+                "suppress-loopback": "undefined",
+                "timeout": null,
+                "ttl": null
+            },
+            "schema": 1
+        },
+        "type": "rtt"
+    },
+    "test2": {
+        "options": {
+            "Advanced-Groups": {
+                "bandwidth": null,
+                "bandwidth-strict": "undefined",
+                "burst-size": null,
+                "congestion": null,
+                "link-rtt": null,
+                "mss": null,
+                "single-ended": "undefined",
+                "udp": "undefined"
+            },
+            "Basic-Groups": {
+                "dest": null,
+                "duration": null
+            },
+            "Everything-Else": {
+                "buffer-length": null,
+                "client-cpu-affinity": null,
+                "dest-node": null,
+                "flow-label": null,
+                "interval": null,
+                "iptos": null,
+                "ipversion": null,
+                "local-address": null,
+                "no-delay": "undefined",
+                "omit": null,
+                "parallel": null,
+                "reverse": "undefined",
+                "server-cpu-affinity": null,
+                "single-ended-port": null,
+                "source": null,
+                "source-node": null,
+                "window-size": null,
+                "zero-copy": "undefined"
+            },
+            "schema": 1
+        },
+        "type": "throughput"
+    }
+}

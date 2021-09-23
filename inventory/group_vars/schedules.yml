@@ -1,0 +1,8 @@
+{
+    "new schedule": {
+        "repeat": "3 3 2 1 1"
+    },
+    "schedule_every_2_hours": {
+        "repeat": "0 */2 * * *"
+    }
+}

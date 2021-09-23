@@ -1,0 +1,51 @@
+usual vue project stuff
+main.js hooks a vue root to the app element
+
+app.vue: the main app that holds the tabs and, on mount, the pssid data from ajax
+each tab has an instance of node-vue and the appropriate data and props are sent
+(hosts gets the host data, groups get groups, etc)
+also each instance has some props like listdata (which data to show to the user)
+
+nodeVue.vue: list of generalized "nodes"
+a node is an element in a list like hosts, groups, schedules
+add delete and refresh are here:
+- add changes the form shown (ill get to that later)
+- delete calls the ajax there and removes the corresponding node, this gets
+  sent back up to app.vue without an event because its an array
+  and i used splice shh dont tell anyone
+- refresh emits an event to app.vue to redo the init of all the pssid data
+the most important part of nodeVue is the 2 child components vue-editor, one for new nodes and one for edit
+vue-editor represents the actual form for editing nodes
+the schema for the form is passed down all the way from app.vue through `filename`
+for editing forms the computed activeNode is used to set an init value (more on that right now in the next line)
+
+vueEditor.vue: the json form, my magnum opus
+first it reads the corresponding jsonschema to set vue-form-json up and figure out what the slots should be
+then it goes back and uses the same jsonschema to generate the components that go in the slots
+it matches up slot name with the keyname from the node that its editing and sets `initvalue` in item.props
+for example if a node has a key called "SSID" then the slot with name "SSID" would get initvalue set to node["SSID"]
+(confusingly the node is called init internally sorry)
+also the extradata option can be used to bring other node lists like host or schedules into the corresponding input type
+speaking of which
+
+inputtypes: the reusable components that get slotted into the form
+in the jsonschema you have to pick a `component-name` which determines which input component you want
+theres a bunch i made already for different use cases, for example custom-input for general text input or cron-input for cron
+custom-input has some explanation but basically
+it takes in `initvalue` (explained earlier) and uses it as a default value
+then it has to emit `updateFormValue` with the format {title: value}
+that gets piped up to nodeVue which ajaxes it to the backend
+depending on the vueEditor it was called from it goes to /submit/ or /edit/
+then the response goes up to app.vue to fix the master pssid data
+
+
+so basically:
+app.vue gets all the pssid data from ajax
+nodeVue lists the corresponding nodes from the data
+vueEditor loads a form based on a jsonschema
+the form generates slots based on the schema and then fills in the slots with custom input components
+the custom input components get `initvalue` and emit `{title: value}`
+when the form is submitted vueEditor emits to nodeVue
+nodeVue ajaxes to the backend
+nodeVue emits to app.vue to finish
+the end

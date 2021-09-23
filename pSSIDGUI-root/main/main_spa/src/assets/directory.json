@@ -1,0 +1,23 @@
+[
+            
+    {
+      "slot": "name",
+      "componentname": "custom-input",
+      "props": {
+        "title": "name",
+        "placeholder": "Name...",
+        "label": "Name"
+      }
+    }
+  ,
+    {
+      "slot": "path",
+      "componentname": "custom-input",
+      "props": {
+        "title": "path",
+        "placeholder": "Path...",
+        "label": "Path"
+      }
+    }
+  
+]

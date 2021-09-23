@@ -1,0 +1,79 @@
+[
+    {
+        "slot": "name",
+        "componentname": "custom-input",
+        "props": {
+            "title": "name",
+            "placeholder": "Name...",
+            "label": "Name"
+        }
+    },
+    {
+        "slot": "interface",
+        "componentname": "node-picker",
+        "props": {
+            "title": "interface",
+            "listData": ["name"],
+            "keyname": "name",
+            "single": true,
+            "label": "Interface"
+        },
+        "extraData": {
+            "list": "network_interfaces"
+        }
+    },
+    {
+        "slot": "profiles",
+        "componentname": "node-picker",
+        "props": {
+            "title": "profiles",
+            "listData": ["name"],
+            "keyname": "name",
+            "single": true,
+            "label": "SSID Profile"
+        },
+        "extraData": {
+            "list": "ssid_profiles"
+        }
+    },
+    {
+        "slot": "unknown_SSID_warning",
+        "componentname": "checkbox-input",
+        "props": {
+            "title": "unknown_SSID_warning",
+            "label": "Unknown SSID Warning"
+        }
+    },
+    {
+        "slot": "schedule",
+        "componentname": "node-picker",
+        "props": {
+            "title": "schedule",
+            "listData": ["name"],
+            "keyname": "name",
+            "label": "Schedule"
+        },
+        "extraData": {
+            "list": "schedules"
+        }
+    },
+    {
+        "slot": "priority",
+        "componentname": "custom-input",
+        "props": {
+            "title": "priority",
+            "placeholder": "Priority...",
+            "type": "number",
+            "label": "Priority"
+        }
+    },
+    {
+        "slot": "meta_information",
+        "componentname": "custom-input",
+        "props": {
+            "title": "meta_information",
+            "placeholder": "Meta...",
+            "label": "Meta Information"
+        }
+    }
+]

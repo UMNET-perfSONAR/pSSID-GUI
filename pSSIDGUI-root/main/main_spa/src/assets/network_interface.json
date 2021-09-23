@@ -1,0 +1,24 @@
+[
+            
+    {
+      "slot": "name",
+      "componentname": "custom-input",
+      "props": {
+        "title": "name",
+        "placeholder": "Name...",
+        "initvalue": null,
+        "label": "Name"
+      }
+    }
+  ,         
+    {
+      "slot": "interface",
+      "componentname": "custom-input",
+      "props": {
+        "title": "interface",
+        "placeholder": "Interface...",
+        "initvalue": null,
+        "label": "Interface"
+      }
+    }
+]

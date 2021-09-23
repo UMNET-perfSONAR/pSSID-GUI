@@ -1,0 +1,260 @@
+{
+    "description": "Round Trip Time test",
+    "title": "Round Trip Time",
+    "type": "object",
+    "properties": {
+      "Basic-Groups": {
+        "title": "Basic Groups",
+        "type": "object",
+        "properties": {
+          "count": {
+            "alternate-switches": [
+              "c"
+            ],
+            "default": null,
+            "description": "Number of probes to be sent",
+            "help": "Lorem ipsum dolor sit amet ...",
+            "minimum": 1,
+            "required": false,
+            "schema": 1,
+            "title": "Count",
+            "type": "number"
+          },
+          "dest": {
+            "#": {
+              "#": "SOURCE: https://stackoverflow.com/a/32368136",
+              "FQDN": "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$",
+              "IPv4": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+              "IPv6": "(?:^|(?<=\\s))(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))(?=\\s|$)"
+            },
+            "alternate-switches": [
+              "d"
+            ],
+            "default": null,
+            "description": "Destination Host to which round trip time will be determined",
+            "help": "Lorem ipsum dolor sit amet ...",
+            "pattern": "((^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$)|(^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$)|((?:^|(?<=\\s))(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))(?=\\s|$)))",
+            "required": true,
+            "schema": 1,
+            "title": "Destination*",
+            "type": "string"
+          }
+        },
+        "options": {
+          "collapsed": false,
+          "remove_empty_properties": true,
+          "use_default_values": true
+        }
+      },
+      "Advanced-Groups": {
+        "title": "Advanced-Groups",
+        "type": "object",
+        "properties": {
+          "fragment": {
+            "default": "undefined",
+            "description": "Allow sending of fragmented packets",
+            "help": "Lorem ipsum dolor sit amet ...",
+            "options": {
+              "enum_titles": [
+                "Allow",
+                "Prevent"
+              ],
+              "use_default_values": true
+            },
+            "required": false,
+            "schema": 3,
+            "title": "Fragmentation",
+            "type": "boolean"
+          },
+          "protocol": {
+            "default": null,
+            "description": "Measurement protocol to use",
+            "enum": [
+              "icmp",
+              "twmp"
+            ],
+            "help": "Lorem ipsum dolor sit amet ...",
+            "required": false,
+            "schema": 2,
+            "title": "Protocol",
+            "type": "string"
+          }
+        },
+        "options": {
+          "collapsed": true,
+          "remove_empty_properties": true,
+          "use_default_values": true
+        }
+      },
+      "Everything-Else": {
+        "title": "Everything-Else",
+        "type": "object",
+        "properties": {
+          "deadline": {
+            "default": null,
+            "description": "Deadline for all measurements to complete",
+            "help": "Lorem ipsum dolor sit amet ...",
+            "pattern": "^P(?:\\d+(?:\\.\\d+)?W)?(?:\\d+(?:\\.\\d+)?D)?(?:T(?:\\d+(?:\\.\\d+)?H)?(?:\\d+(?:\\.\\d+)?M)?(?:\\d+(?:\\.\\d+)?S)?)?$",
+            "required": false,
+            "schema": 1,
+            "title": "Deadline",
+            "type": "string",
+            "x-invalid-message": "'%s' is not a valid ISO 8601 duration."
+          },
+          "flow-label": {
+            "default": null,
+            "description": "Flow label for the round trip time",
+            "help": "Lorem ipsum dolor sit amet ...",
+            "required": false,
+            "schema": 1,
+            "title": "Flow-Label",
+            "type": "number"
+          },
+          "hostnames": {
+            "default": "undefined",
+            "description": "Look up host names from IPs for round trip",
+            "help": "Lorem ipsum dolor sit amet ...",
+            "options": {
+              "enum_titles": [
+                "Look Up IP",
+                "Don't Look Up IP"
+              ],
+              "use_default_values": true
+            },
+            "required": false,
+            "schema": 1,
+            "title": "Hostnames",
+            "type": "boolean"
+          },
+          "interval": {
+            "alternate-switches": [
+              "i"
+            ],
+            "default": null,
+            "description": "Time to wait between packets sent",
+            "help": "Lorem ipsum dolor sit amet ...",
+            "pattern": "^P(?:\\d+(?:\\.\\d+)?W)?(?:\\d+(?:\\.\\d+)?D)?(?:T(?:\\d+(?:\\.\\d+)?H)?(?:\\d+(?:\\.\\d+)?M)?(?:\\d+(?:\\.\\d+)?S)?)?$",
+            "required": false,
+            "schema": 1,
+            "title": "Interval",
+            "type": "string",
+            "x-invalid-message": "'%s' is not a valid ISO 8601 duration."
+          },
+          "iptos": {
+            "default": null,
+            "description": "IP type of service octet",
+            "help": "Lorem ipsum dolor sit amet ...",
+            "maximum": 255,
+            "minimum": 0,
+            "required": false,
+            "schema": 1,
+            "title": "IP-tos",
+            "type": "integer"
+          },
+          "ipversion": {
+            "default": "",
+            "description": "Determines the IP version to use 4 or 6",
+            "help": "Lorem ipsum dolor sit amet ...",
+            "required": false,
+            "schema": 1,
+            "title": "IP-version",
+            "type": "number"
+          },
+          "length": {
+            "default": null,
+            "description": "Packet Length",
+            "help": "Lorem ipsum dolor sit amet ...",
+            "minimum": 1,
+            "required": false,
+            "schema": 1,
+            "title": "Length",
+            "type": "integer"
+          },
+          "source": {
+            "#": {
+              "#": "SOURCE: https://stackoverflow.com/a/32368136",
+              "FQDN": "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$",
+              "IPv4": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+              "IPv6": "(?:^|(?<=\\s))(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))(?=\\s|$)"
+            },
+            "alternate-switches": [
+              "s"
+            ],
+            "default": null,
+            "description": "Source address or interface",
+            "help": "Lorem ipsum dolor sit amet ...",
+            "pattern": "((^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$)|(^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$)|((?:^|(?<=\\s))(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))(?=\\s|$)))",
+            "required": false,
+            "schema": 1,
+            "title": "Source",
+            "type": "string"
+          },
+          "source-node": {
+            "#": {
+              "#": "SOURCE: https://stackoverflow.com/a/32368136",
+              "FQDN": "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$",
+              "IPv4": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+              "IPv6": "(?:^|(?<=\\s))(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))(?=\\s|$)"
+            },
+            "default": null,
+            "description": "Source Pscheduler Node, if different",
+            "help": "Lorem ipsum dolor sit amet ...",
+            "pattern": "((^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$)|(^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$)|((?:^|(?<=\\s))(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))(?=\\s|$)))",
+            "required": false,
+            "schema": 1,
+            "title": "Source-Node",
+            "type": "string"
+          },
+          "suppress-loopback": {
+            "default": "undefined",
+            "description": "Suppress multicast loopback",
+            "help": "Lorem ipsum dolor sit amet ...",
+            "options": {
+              "enum_titles": [
+                "Suppress Loopback",
+                "Don't Suppress Loopback"
+              ],
+              "use_default_values": true
+            },
+            "required": false,
+            "schema": 1,
+            "title": "Suppress-Loopback",
+            "type": "boolean"
+          },
+          "timeout": {
+            "default": null,
+            "description": "Timeout for each round trip",
+            "help": "Lorem ipsum dolor sit amet ...",
+            "pattern": "^P(?:\\d+(?:\\.\\d+)?W)?(?:\\d+(?:\\.\\d+)?D)?(?:T(?:\\d+(?:\\.\\d+)?H)?(?:\\d+(?:\\.\\d+)?M)?(?:\\d+(?:\\.\\d+)?S)?)?$",
+            "required": false,
+            "schema": 1,
+            "title": "Timeout",
+            "type": "string",
+            "x-invalid-message": "'%s' is not a valid ISO 8601 duration."
+          },
+          "ttl": {
+            "default": null,
+            "description": "Time to Live",
+            "help": "Lorem ipsum dolor sit amet ...",
+            "minimum": 1,
+            "required": false,
+            "schema": 1,
+            "title": "TTL",
+            "type": "integer"
+          }
+        },
+        "options": {
+          "collapsed": true,
+          "remove_empty_properties": true
+        }
+      },
+      "schema": {
+        "default": 1,
+        "minimum": 1,
+        "options": {
+          "hidden": true
+        },
+        "type": "integer"
+      }
+    }
+  }

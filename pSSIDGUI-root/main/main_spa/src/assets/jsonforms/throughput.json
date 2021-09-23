@@ -1,0 +1,448 @@
+{
+  "description": "Throughput test",
+  "properties": {
+    "Basic-Groups": {
+      "options": {
+        "collapsed": false,
+        "remove_empty_properties": true,
+        "use_default_values": true
+      },
+      "properties": {
+        "dest": {
+          "#": {
+            "#": "SOURCE: https://stackoverflow.com/a/32368136",
+            "FQDN": "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$",
+            "IPv4": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+            "IPv6": "(?:^|(?<=\\s))(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))(?=\\s|$)"
+          },
+          "alternate-switches": [
+            "d"
+          ],
+          "default": null,
+          "description": "Destination Host to which throughput will be determined",
+          "pattern": "((^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$)|(^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$)|((?:^|(?<=\\s))(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))(?=\\s|$)))",
+          "required": true,
+          "title": "Destination*",
+          "type": "string",
+          "options": {
+            "infoText": "Any other relevant info"
+          }
+        },
+        "duration": {
+          "alternate-switches": [
+            "t"
+          ],
+          "default": null,
+          "description": "Total runtime of the test",
+          "pattern": "^P(?:\\d+(?:\\.\\d+)?W)?(?:\\d+(?:\\.\\d+)?D)?(?:T(?:\\d+(?:\\.\\d+)?H)?(?:\\d+(?:\\.\\d+)?M)?(?:\\d+(?:\\.\\d+)?S)?)?$",
+          "required": false,
+          "title": "Duration",
+          "type": "string",
+          "x-invalid-message": "'%s' is not a valid ISO 8601 duration.",
+          "options": {
+            "infoText": "Any other relevant info"
+          }
+        }
+      },
+      "title": "Basic Groups",
+      "type": "object"
+    },
+    "Advanced-Groups": {
+      "options": {
+        "collapsed": true,
+        "remove_empty_properties": true,
+        "use_default_values": true
+      },
+      "properties": {
+        "bandwidth": {
+          "alternate-switches": [
+            "b"
+          ],
+          "default": null,
+          "description": "Bandwidth to rate limit the test to, supports SI notation such as 1G",
+          "minimum": 1,
+          "required": false,
+          "title": "Bandwidth",
+          "type": "integer",
+          "options": {
+            "infoText": "Any other relevant info"
+          }
+        },
+        "bandwidth-strict": {
+          "default": "undefined",
+          "description": "Never go faster than --bandwidth, even to make up for lost time",
+          "options": {
+            "enum_titles": [
+              "Allow Bandwidth strictness",
+              "Prevent Bandwidth strictness"
+            ],
+            "use_default_values": true,
+            "infoText": "Any other relevant info"
+          },
+          "required": false,
+          "title": "Bandwidth Strict",
+          "type": "boolean"
+        },
+        "burst-size": {
+          "default": null,
+          "description": "Limit bursts of packets to this number",
+          "minimum": 1,
+          "required": false,
+          "title": "Burst Size",
+          "type": "integer",
+          "options": {
+            "infoText": "Any other relevant info"
+          }
+        },
+        "congestion": {
+          "default": null,
+          "description": "Set TCP congestion control algorithm",
+          "required": false,
+          "title": "Congestion",
+          "type": "string",
+          "options": {
+            "infoText": "Any other relevant info"
+          }
+        },
+        "link-rtt": {
+          "default": null,
+          "description": "Approximate Link Round Trip Time",
+          "pattern": "^P(?:\\d+(?:\\.\\d+)?W)?(?:\\d+(?:\\.\\d+)?D)?(?:T(?:\\d+(?:\\.\\d+)?H)?(?:\\d+(?:\\.\\d+)?M)?(?:\\d+(?:\\.\\d+)?S)?)?$",
+          "required": false,
+          "title": "Link RTT",
+          "type": "string",
+          "x-invalid-message": "'%s' is not a valid ISO 8601 duration.",
+          "options": {
+            "infoText": "Any other relevant info"
+          }
+        },
+        "mss": {
+          "alternate-switches": [
+            "m"
+          ],
+          "default": null,
+          "description": "TCP maximum segment size",
+          "minimum": 1,
+          "required": false,
+          "title": "MSS",
+          "type": "integer",
+          "options": {
+            "infoText": "Any other relevant info"
+          }
+        },
+        "single-ended": {
+          "default": "undefined",
+          "description": "Run a test directly to a host without Pscheduler",
+          "options": {
+            "enum_titles": [
+              "Allow single ended test",
+              "Prevent run single ended"
+            ],
+            "use_default_values": true,
+            "infoText": "Any other relevant info"
+          },
+          "required": false,
+          "title": "Single Ended",
+          "type": "boolean"
+        },
+        "udp": {
+          "alternate-switches": [
+            "u"
+          ],
+          "default": "undefined",
+          "description": "Use UDP instead of TCP testing",
+          "options": {
+            "enum_titles": [
+              "Use UDP",
+              "Use TCP"
+            ],
+            "use_default_values": true,
+            "infoText": "Any other relevant info"
+          },
+          "required": false,
+          "title": "UDP/TCP",
+          "type": "boolean"
+        }
+      },
+      "title": "Advanced-Groups",
+      "type": "object"
+    },
+    "Everything-Else": {
+      "options": {
+        "collapsed": true,
+        "remove_empty_properties": true
+      },
+      "properties": {
+        "buffer-length": {
+          "alternate-switches": [
+            "l"
+          ],
+          "default": null,
+          "description": "Length of the buffer to read/write from",
+          "minimum": 1,
+          "required": false,
+          "schema": 1,
+          "title": "Buffer Length",
+          "type": "integer",
+          "options": {
+            "infoText": "Any other relevant info"
+          }
+        },
+        "client-cpu-affinity": {
+          "default": null,
+          "description": "Set the sending side's CPU affinity",
+          "required": false,
+          "schema": 1,
+          "title": "Client CPU Affinity",
+          "type": "integer",
+          "options": {
+            "infoText": "Any other relevant info"
+          }
+        },
+        "dest-node": {
+          "type": "string",
+          "default": null,
+          "description": "pScheduler node on receiving host, if different",
+          "required": false,
+          "schema": 1,
+          "title": "Destination Node",
+          "options": {
+            "infoText": "Any other relevant info"
+          }
+        },
+        "flow-label": {
+          "default": null,
+          "description": "Flow label for the round trip time",
+          "minimum": 1,
+          "required": false,
+          "schema": 1,
+          "title": "Flow-Label",
+          "type": "integer",
+          "options": {
+            "infoText": "Any other relevant info"
+          }
+        },
+        "interval": {
+          "alternate-switches": [
+            "i"
+          ],
+          "default": null,
+          "description": "Time to wait between packets sent",
+          "pattern": "^P(?:\\d+(?:\\.\\d+)?W)?(?:\\d+(?:\\.\\d+)?D)?(?:T(?:\\d+(?:\\.\\d+)?H)?(?:\\d+(?:\\.\\d+)?M)?(?:\\d+(?:\\.\\d+)?S)?)?$",
+          "required": false,
+          "schema": 1,
+          "title": "Interval",
+          "type": "string",
+          "x-invalid-message": "'%s' is not a valid ISO 8601 duration.",
+          "options": {
+            "infoText": "Any other relevant info"
+          }
+        },
+        "iptos": {
+          "default": null,
+          "description": "IP type of service octet",
+          "maximum": 255,
+          "minimum": 0,
+          "required": false,
+          "schema": 1,
+          "title": "IP-tos",
+          "type": "integer",
+          "options": {
+            "infoText": "Any other relevant info"
+          }
+        },
+        "ipversion": {
+          "default": null,
+          "description": "Determines the IP version to use 4 or 6",
+          "help": "Lorem ipsum dolor sit amet ...",
+          "required": false,
+          "schema": 1,
+          "title": "IP-version",
+          "type": "integer",
+          "options": {
+            "infoText": "Any other relevant info"
+          }
+        },
+        "local-address": {
+          "#": {
+            "#": "SOURCE: https://stackoverflow.com/a/32368136",
+            "FQDN": "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$",
+            "IPv4": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+            "IPv6": "(?:^|(?<=\\s))(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))(?=\\s|$)"
+          },
+          "alternate-switches": [
+            "B"
+          ],
+          "default": null,
+          "description": "Local Address to be used for control and tests",
+          "pattern": "((^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$)|(^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$)|((?:^|(?<=\\s))(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))(?=\\s|$)))",
+          "required": false,
+          "schema": 1,
+          "title": "Local Address",
+          "type": "string",
+          "options": {
+            "infoText": "Any other relevant info"
+          }
+        },
+        "no-delay": {
+          "default": "undefined",
+          "description": "Set TCP no-delay flag, disables Nagle's algorithm",
+          "options": {
+            "enum_titles": [
+              "Set no-delay flag",
+              "Don't Set no-delay flag"
+            ],
+            "use_default_values": true,
+            "infoText": "Any other relevant info"
+          },
+          "required": false,
+          "title": "No Delay",
+          "type": "boolean"
+        },
+        "omit": {
+          "alternate-switches": [
+            "O"
+          ],
+          "default": null,
+          "description": "Number of seconds to omit from the start of the test",
+          "pattern": "^P(?:\\d+(?:\\.\\d+)?W)?(?:\\d+(?:\\.\\d+)?D)?(?:T(?:\\d+(?:\\.\\d+)?H)?(?:\\d+(?:\\.\\d+)?M)?(?:\\d+(?:\\.\\d+)?S)?)?$",
+          "required": false,
+          "schema": 1,
+          "title": "Omit",
+          "type": "string",
+          "x-invalid-message": "'%s' is not a valid ISO 8601 duration.",
+          "options": {
+            "infoText": "Any other relevant info"
+          }
+        },
+        "parallel": {
+          "alternate-switches": [
+            "P"
+          ],
+          "default": null,
+          "description": "Number of parallel streams to run during the test",
+          "minimum": 1,
+          "required": false,
+          "schema": 1,
+          "title": "Parallel",
+          "type": "integer",
+          "options": {
+            "infoText": "Any other relevant info"
+          }
+        },
+        "reverse": {
+          "default": "undefined",
+          "description": "Reverse the direction of the test",
+          "options": {
+            "enum_titles": [
+              "Reverse the direction",
+              "Don't Reverse the direction"
+            ],
+            "use_default_values": true,
+            "infoText": "Any other relevant info"
+          },
+          "required": false,
+          "title": "Reverse",
+          "type": "boolean"
+        },
+        "server-cpu-affinity": {
+          "default": null,
+          "description": "Set the receiving's side's CPU affinity",
+          "help": "Lorem ipsum dolor sit amet ...",
+          "required": false,
+          "schema": 1,
+          "title": "Server CPU Affinity",
+          "type": "integer",
+          "options": {
+            "infoText": "Any other relevant information for input..."
+          }
+        },
+        "single-ended-port": {
+          "default": null,
+          "description": "Run a test directly to a given port",
+          "help": "Lorem ipsum dolor sit amet ...",
+          "required": false,
+          "schema": 1,
+          "title": "single-ended-port",
+          "type": "integer",
+          "options": {
+            "infoText": "Any other relevant info"
+          }
+        },
+        "source": {
+          "#": {
+            "#": "SOURCE: https://stackoverflow.com/a/32368136",
+            "FQDN": "^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$",
+            "IPv4": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+            "IPv6": "(?:^|(?<=\\s))(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))(?=\\s|$)"
+          },
+          "alternate-switches": [
+            "s"
+          ],
+          "default": null,
+          "description": "Source address or interface",
+          "pattern": "((^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\\-]*[A-Za-z0-9])$)|(^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$)|((?:^|(?<=\\s))(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))(?=\\s|$)))",
+          "required": false,
+          "schema": 1,
+          "title": "Source",
+          "type": "string",
+          "options": {
+            "infoText": "Any other relevant info"
+          }
+        },
+        "source-node": {
+          "type": "string",
+          "default": null,
+          "description": "Source Pscheduler Node, if different",
+          "required": false,
+          "schema": 1,
+          "title": "Source-Node",
+          "options": {
+            "infoText": "Any other relevant info"
+          }
+        },
+        "window-size": {
+          "alternate-switches": [
+            "w"
+          ],
+          "default": null,
+          "description": "TCP window size to use for the test, supports SI notation such as 64M",
+          "minimum": 1,
+          "required": false,
+          "schema": 1,
+          "title": "Window Size",
+          "type": "integer",
+          "options": {
+            "infoText": "Any other relevant info"
+          }
+        },
+        "zero-copy": {
+          "default": "undefined",
+          "description": "Use a 'zero copy' method of sending data",
+          "options": {
+            "enum_titles": [
+              "Use zero copy method",
+              "Don't use zero copy method"
+            ],
+            "use_default_values": true,
+            "infoText": "Any other relevant info"
+          },
+          "required": false,
+          "title": "Zero Copy",
+          "type": "boolean"
+        }
+      },
+      "title": "Everything-Else",
+      "type": "object"
+    },
+    "schema": {
+      "default": 1,
+      "options": {
+        "hidden": true
+      },
+      "type": "number"
+    }
+  },
+  "title": "Throughput",
+  "type": "object"
+}

@@ -1,0 +1,162 @@
+.nav-link{
+    cursor:pointer;
+}
+
+.new-object-form{
+    margin: 2em;
+    padding: 0.5em;
+    float:left;
+}
+
+#node-list, #group-list, #task-list, #schedule-list{
+    width: 25%;
+    margin: 2em;
+    margin-top: 2em;
+    float: left;
+    padding:0.5em;
+    display: flex;
+    flex-flow: column;
+    word-wrap: break-word;
+}
+
+#node-list, #node-title, #node-search-container, #group-list, #group-title, #group-search-container, #task-list, #task-title, #task-search-container, #schedule-list, #schedule-title, #schedule-search-container{
+    flex: 0 1 auto;
+}
+
+
+.node-search, #group-search, #task-search, #schedule-search{
+    margin-bottom: 5%;
+}
+
+#node-list, #inner-node-list-container, #group-list, #inner-group-list-container, #task-list, #inner-task-list-container, #schedule-list, #inner-schedule-list-container{
+    flex: 1 1 auto;
+    overflow: auto;
+}
+
+#node-button-container, #group-button-container, #task-button-container, #schedule-button-container{
+    display: flex;
+}
+
+#add-node-form, #add-group-form, #add-task-form, #add-schedule-form{
+    display:flex;
+    flex-grow:1;
+    margin-bottom: 0%;
+    
+}
+
+#refresh-button, #refresh-button-group, #refresh-button-task, #refresh-button-schedule{
+    margin-top: 5%;
+    width: auto;
+    float:right;
+}
+
+#add-node-button, #add-group-button, #add-task-button, #add-schedule-button{
+    margin-top: 5%;
+    margin-right: 5%;
+    float:left;
+    flex-grow:1;
+    
+}
+
+#add-node-input, #add-group-input, #add-task-input, #add-schedule-input{
+    flex: 1 100%;
+    margin-top: 5%;
+    
+} 
+
+#add-node-confirm, #add-group-confirm, #add-task-confirm, #add-schedule-confirm{
+    width: auto;
+    margin-top: 5%;
+    margin-right: 5%;
+    
+}
+
+#add-node-cancel, #add-group-cancel, #add-task-cancel, #add-schedule-cancel{
+    width: auto;
+    margin-top: 5%;
+}
+
+#remove-button, #remove-meta{
+    float:right;
+    width: auto;
+    color: white;
+}
+
+#node-list, #refresh-button, #group-list, #task-list, #schedule-list{
+    flex: 0 1 auto;
+}
+
+.name{
+    margin-right: 10%;
+    font-weight: bold;
+}
+
+.dot {
+    height: 0.5em;
+    width: 0.5em;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
+    margin-left: 5%;
+    /* background-color: $brand-success; */
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+#main-container{
+    display: flex;
+    height: 80vh;
+}
+
+#task-menu{
+width: 20%;
+margin: 2em;
+margin-top: 2em;
+margin-bottom: 2em;
+
+float: left;
+padding:0.5em;
+flex-grow: 1;
+}
+
+#tests-dropdown{
+    float: left;
+}
+
+#archivers-dropdown{
+    float: right;
+}
+
+#loader {
+    border: 16px solid #f3f3f3; /* Light grey */
+    border-top: 16px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: spin 2s linear infinite;
+    margin: auto;
+}
+  
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+input[type=search]::-webkit-search-cancel-button {
+    -webkit-appearance: searchfield-cancel-button;
+    /* i hate bootstrap */
+}
+
+.textlabel {
+    display: block;
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    padding-top: calc(0.375rem + 1px);
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+}

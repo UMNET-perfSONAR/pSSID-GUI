@@ -1,0 +1,35 @@
+[
+            
+  {
+    "slot": "name",
+    "componentname": "custom-input",
+    "props": {
+      "title": "name",
+      "placeholder": "Name...",
+      "initvalue": null,
+      "label": "Name"
+    }
+  }
+,
+  {
+    "slot": "type",
+    "componentname": "node-picker",
+    "props": {
+      "title": "type",
+      "listData": ["name"],
+      "keyname": "name",
+      "label": "Type",
+      "single": true
+    },
+    "extraData": {"list": "archivernames"}
+  }
+,
+  {
+    "slot": "spec",
+    "componentname": "json-editor",
+    "props": {
+      "title": "spec"
+    }
+  }
+
+]

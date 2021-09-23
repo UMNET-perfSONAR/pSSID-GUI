@@ -1,0 +1,13 @@
+{
+    "primary_BSSIDs": {
+        "interface": "primary_network_interface",
+        "meta_information": "probe_stats",
+        "priority": 1,
+        "profiles": "all_profiles",
+        "schedule": [
+            "schedule_every_5_min",
+            "schedule_every_5_hours"
+        ],
+        "unknown_SSID_warning": true
+    }
+}

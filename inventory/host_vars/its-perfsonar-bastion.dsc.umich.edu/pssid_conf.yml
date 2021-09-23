@@ -1,0 +1,104 @@
+{
+    "archivers": [
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/archivers/bitbucket",
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/archivers/esmond",
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/archivers/failer",
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/archivers/http",
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/archivers/kafka",
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/archivers/rabbitmq",
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/archivers/snmptrap",
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/archivers/syslog"
+    ],
+    "id": 0,
+    "ip": "its-perfsonar-bastion.dsc.umich.edu",
+    "meta": [],
+    "name": "Julie",
+    "status": "success",
+    "tasks": {
+        "example_task_http": {
+            "BSSIDs": "primary_BSSIDs",
+            "archivers": [],
+            "id": 0,
+            "priority": 5,
+            "profiles": [],
+            "schedule": [
+                "new schedule",
+                "schedule_every_2_hours"
+            ],
+            "tests": [
+                {
+                    "name": "rtttest",
+                    "options": {},
+                    "type": "rtt"
+                },
+                "test2",
+                "rtttest"
+            ],
+            "ttl": 60
+        },
+        "example_task_latency": {
+            "BSSIDs": "primary_BSSIDs",
+            "archivers": [],
+            "id": 1,
+            "priority": 4,
+            "profiles": [],
+            "schedule": [
+                "new schedule",
+                "schedule_every_2_hours"
+            ],
+            "tests": [],
+            "ttl": 60
+        },
+        "example_task_rtt": {
+            "BSSIDs": "primary_BSSIDs",
+            "archivers": [],
+            "id": 0,
+            "priority": 3,
+            "profiles": [
+                "MWireless_profile"
+            ],
+            "schedule": [],
+            "tests": [
+                "rtt"
+            ],
+            "ttl": 45
+        },
+        "example_task_throughput": {
+            "BSSIDs": "primary_BSSIDs",
+            "archivers": [],
+            "id": 0,
+            "meta_information": "probe_stats",
+            "priority": 2,
+            "profiles": [],
+            "schedule": [],
+            "test": [],
+            "throughput_threshold": 95000000,
+            "ttl": 60
+        }
+    },
+    "tests": [
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/tests/amsterdam",
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/tests/clock",
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/tests/disk-to-disk",
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/tests/dns",
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/tests/example",
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/tests/foo",
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/tests/http",
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/tests/idle",
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/tests/idlebgm",
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/tests/idleex",
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/tests/latency",
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/tests/latencybg",
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/tests/netreach",
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/tests/rtt",
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/tests/s3throughput",
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/tests/simplestream",
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/tests/snmpget",
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/tests/snmpgetbgm",
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/tests/snmpset",
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/tests/test",
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/tests/throughput",
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/tests/trace",
+        "https://its-perfsonar-bastion.dsc.umich.edu/pscheduler/tests/xxx"
+    ]
+}
