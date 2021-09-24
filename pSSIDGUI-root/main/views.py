@@ -1122,7 +1122,8 @@ def init(request):
         "tasks": tasks,
         "directories": request.session["directories"],
         "testnames": testnames,
-        "archivernames": archivernames
+        "archivernames": archivernames,
+        "token": token
     }, safe=False)
 
 
