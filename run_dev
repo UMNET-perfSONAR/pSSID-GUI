@@ -1,0 +1,2 @@
+export SECRET_KEY=fjbgskjdfhvg
+python3 pSSIDGUI-root/manage.py runserver $1
