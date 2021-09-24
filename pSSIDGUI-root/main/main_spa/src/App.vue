@@ -157,6 +157,7 @@ import nodeVue from "./components/nodeVue.vue";
 import Vue from "vue";
 import axios from "axios";
 import VueAxios from "vue-axios";
+import Cookies from 'js-cookie'
 import VuePluralize from 'vue-pluralize'
  
 Vue.use(VuePluralize)
@@ -225,8 +226,13 @@ export default Vue.extend({
         })
         .then((response) => {
           console.log(response.data);
+          const csrftoken = response.data["token"];
+          Cookies.set("csrftoken", csrftoken);
+          Vue.axios.defaults.headers.common['X-CSRFTOKEN'] = csrftoken;
           for (var key in response.data) {
-            this[key] = response.data[key];
+            if (key != "token"){
+              this[key] = response.data[key];
+            }
           }
           // convert from key: value to key: key value: value
 
@@ -285,8 +291,13 @@ export default Vue.extend({
     this.$refs.loader.style.display = "block";
     Vue.axios.get("/init/").then((response) => {
       console.log(response.data);
+      const csrftoken = response.data["token"];
+      Cookies.set("csrftoken", csrftoken);
+      Vue.axios.defaults.headers.common['X-CSRFTOKEN'] = csrftoken;
       for (var key in response.data) {
-        this[key] = response.data[key];
+        if (key != "token"){
+          this[key] = response.data[key];
+        }
       }
 
       

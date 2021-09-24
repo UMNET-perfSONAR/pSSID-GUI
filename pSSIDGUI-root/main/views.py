@@ -11,6 +11,7 @@ import traceback
 from django.http import HttpResponse
 from django.http.response import JsonResponse
 from django.template import loader
+from django.middleware.csrf import get_token
 import requests
 from urllib3.exceptions import InsecureRequestWarning
 import yaml
@@ -807,14 +808,18 @@ def submit_archiver(request, data, action):
         print(traceback.format_exc())
 
 def init(request):
+    token = get_token(request)
     if request.GET.get("directory", None) is None:
         for i in request.session.get("directories", []):
             i["created"] = False
         request.session["directories"] = [{**i, **{"id": index}} for index, i in enumerate(
             request.session.get("directories", [])) if os.path.isdir(i["path"])]
         return JsonResponse({
-            "directories": request.session["directories"]
+            "directories": request.session["directories"],
+            "token": token
         }, safe=False)
+
+    
 
     request.session["directory"] = request.GET.get("directory")
 
