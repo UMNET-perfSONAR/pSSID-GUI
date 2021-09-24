@@ -5,4 +5,5 @@ npm --prefix pSSIDGUI-root/main/main_spa run build -- --mode staging
 export SECRET_KEY=fjbgskjdfhvg
 pip3 install -r pSSIDGUI-root/requirements.txt
 python3 pSSIDGUI-root/manage.py collectstatic --no-input
+python3 pSSIDGUI-root/manage.py migrate
 python3 pSSIDGUI-root/manage.py runserver

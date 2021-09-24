@@ -808,7 +808,7 @@ def submit_archiver(request, data, action):
 
 def init(request):
     if request.GET.get("directory", None) is None:
-        for i in request.session["directories"]:
+        for i in request.session.get("directories", []):
             i["created"] = False
         request.session["directories"] = [{**i, **{"id": index}} for index, i in enumerate(
             request.session.get("directories", [])) if os.path.isdir(i["path"])]
