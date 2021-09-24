@@ -14,7 +14,7 @@ Installation:
 
 - `chmod +x build_dev`
 
-- `./build_dev`: build Vue and use Django dev server
+- `./build_dev [IP] [PORT]`: build Vue and host Django dev server at IP:PORT
 
 # Docs (to be put in wiki when repo is public)
 
