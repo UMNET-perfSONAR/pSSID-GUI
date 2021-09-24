@@ -8,9 +8,13 @@ Provided example Ansible directory at `/inventory`
 
 Built with Vue and Django
 
-Included start scripts:
+Installation:
 
-- `build_dev`: build Vue and use Django dev server
+- `pip3 install -r pSSIDGUI-root/requirements.txt`
+
+- `chmod +x build_dev`
+
+- `./build_dev`: build Vue and use Django dev server
 
 # Docs (to be put in wiki when repo is public)
 
