@@ -9,6 +9,7 @@ import traceback
 
 
 from django.http import HttpResponse
+from django.core.exceptions import PermissionDenied
 from django.http.response import JsonResponse
 from django.template import loader
 from django.middleware.csrf import get_token
@@ -16,7 +17,12 @@ import requests
 from urllib3.exceptions import InsecureRequestWarning
 import yaml
 from yaml.loader import SafeLoader
+from pathlib import Path
 
+# TODO: these should be configurable in a config file
+# they should also probably be absolute paths
+INVENTORIES_DIRECTORY = Path("inventories")
+DEFAULT_INVENTORY = Path("default-inventory")
 
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
@@ -534,64 +540,50 @@ def submit_bssid_scan(request, data, action):
         print(e)
         print(traceback.format_exc())
 
+def get_absolute_inventory_path(inventory_name):
+    absolute_path = INVENTORIES_DIRECTORY.joinpath(Path(inventory_name))
+    # verify the submitted path didn't escape our inventories directory
+    if absolute_path.parent != INVENTORIES_DIRECTORY:
+        raise PermissionDenied("Invalid inventory path submitted")
+    
+    return absolute_path
 
-def submit_directory(request, data, action):
+def submit_inventory(request, data, action):
 
-    try:
-        path = data["path"]
-        if data.get("id") is None:
-            data["id"] = len(request.session["directories"])
-        node_id = data.get("id")
-        created = False
-        if os.path.isdir(path):
-            dir = os.listdir(path)
-            if len(dir) == 0:
-                os.mkdir(path + "/host_vars")
-                os.mkdir(path + "/group_vars")
-                os.mkdir(path + "/group_vars/all")
-                with open(path + "/hosts", 'w') as f:
-                    f.write("[all]\n")
-                with open(path + "/group_vars/all/archivernames.yml", 'w') as f:
-                    yaml.dump([], f)
-                with open(path + "/group_vars/all/archivers.yml", 'w') as f:
-                    yaml.dump({"archivers": []}, f)
-                with open(path + "/group_vars/all/bssid_channels.yml", 'w') as f:
-                    yaml.dump({"bssid_channels": []}, f)
-                with open(path + "/group_vars/all/bssid_scans.yml", 'w') as f:
-                    yaml.dump({"bssid_scans": []}, f)
-                with open(path + "/group_vars/all/meta.yml", 'w') as f:
-                    yaml.dump({"meta": []}, f)
-                with open(path + "/group_vars/all/network_interfaces.yml", 'w') as f:
-                    yaml.dump({"network_interfaces": []}, f)
-                with open(path + "/group_vars/all/schedules.yml", 'w') as f:
-                    yaml.dump({"schedules": []}, f)
-                with open(path + "/group_vars/all/ssid_groups.yml", 'w') as f:
-                    yaml.dump({"ssid_groups": []}, f)
-                with open(path + "/group_vars/all/ssid_profiles.yml", 'w') as f:
-                    yaml.dump({"ssid_profiles": []}, f)
-                with open(path + "/group_vars/all/task_list.yml", 'w') as f:
-                    yaml.dump({"task_list": []}, f)
-                with open(path + "/group_vars/all/tasks.yml", 'w') as f:
-                    yaml.dump({"tasks": []}, f)
-                with open(path + "/group_vars/all/testnames.yml", 'w') as f:
-                    yaml.dump([], f)
-                with open(path + "/group_vars/all/tests.yml", 'w') as f:
-                    yaml.dump({"tests": []}, f)
-                created = True
-            data["created"] = created
-            if action == "add":
-                request.session["directories"].append(data)
-            elif action == "edit":
-                request.session["directories"][node_id] = data
-            elif action == "delete":
-                request.session["directories"].pop(node_id)
+    # deletes are not permitted
+    if action == "delete":
+        return HttpResponse(status="405") # Method Not Allowed
+
+    submitted_path = get_absolute_inventory_path(data["path"])
+
+    # generate missing attributes
+    if data.get("id") is None:
+        data["id"] = len(request.session["directories"])
+    node_id = data.get("id")
+    created = True
+
+    # if it already exists, don't overwrite
+    if submitted_path.exists():
+        return HttpResponse(status="409") # Conflict
+
+    # edit is essentially a rename
+    if action == "edit":
+        inventory_to_rename = get_absolute_inventory_path(request.session["directories"][node_id]["path"])
+
+        if inventory_to_rename.exists():
+            inventory_to_rename.rename(submitted_path)
+            data["created"] = False
+            request.session["directories"][node_id] = data
             request.session.modified = True
-            print(data)
             return JsonResponse(data, safe=False)
-        return HttpResponse(status="403")
-    except Exception as e:
-        print(e)
-        print(traceback.format_exc())
+    # if it doesn't exist, just continue to the add routine
+
+    # not edit, not delete, so this is an add
+    shutil.copytree(str(DEFAULT_INVENTORY), str(submitted_path))
+    data["created"] = True
+    request.session["directories"].append(data)
+    request.session.modified = True
+    return JsonResponse(data, safe=False)
 
 
 def submit_task(request, data, action):
@@ -807,21 +799,44 @@ def submit_archiver(request, data, action):
         print(e)
         print(traceback.format_exc())
 
+
+def get_inventories(request, token):
+    # returns JSON suitable for GET /init/ endpoint,
+    # also resyncs the inventories on disk with Django's,
+    # state: request.session["directories"]
+
+    request.session["directories"] = []
+
+    for index, inventory in enumerate(INVENTORIES_DIRECTORY.iterdir()):
+        request.session["directories"].append({
+            # TODO: name should be removed in the future,
+            # don't know how much of frontend relies on it
+            "name": inventory.name,
+            "path": inventory.name,
+            "id": index,
+            "created": False
+        })
+
+    return JsonResponse({
+        "directories": request.session["directories"],
+        "token": token
+    }, safe=False)
+
+
 def init(request):
     token = get_token(request)
+
+    # if the directory query param is absent, we should return all
+    # inventories present
     if request.GET.get("directory", None) is None:
-        for i in request.session.get("directories", []):
-            i["created"] = False
-        request.session["directories"] = [{**i, **{"id": index}} for index, i in enumerate(
-            request.session.get("directories", [])) if os.path.isdir(i["path"])]
-        return JsonResponse({
-            "directories": request.session["directories"],
-            "token": token
-        }, safe=False)
+        return get_inventories(request, token)
 
-    
+    return get_inventory(request, token)
 
-    request.session["directory"] = request.GET.get("directory")
+
+def get_inventory(request, token):
+
+    request.session["directory"] = str(get_absolute_inventory_path(request.GET.get("directory")))
 
     node_id = 0
     task_id = 0
@@ -1022,8 +1037,8 @@ def init(request):
 
         bssid_scans = yamlfile
 
-    request.session["directories"] = [{**i, **{"id": index}} for index, i in enumerate(
-        request.session.get("directories", [])) if os.path.isdir(i["path"])]
+    # this adds the inventories to `request.session["directories"]`
+    get_inventories(request, token)
 
     # with open("rtt.json") as f:
     #     rttjson = yaml.load(f, Loader=SafeLoader)
@@ -1158,7 +1173,7 @@ def submit(request):
     if tab == "task":
         return submit_task(request, data, action)
     if tab == "directory":
-        return submit_directory(request, data, action)
+        return submit_inventory(request, data, action)
     print(tab)
     return False
 
