@@ -1,8 +1,11 @@
 <template>
 
   <div>
-    <div style="position: absolute; left: 2em; top: 2em">
-      Directory: {{ directory.path }}
+    <div
+      style="position: absolute; left: 2em; top: 2em"
+      v-if="directory.path"
+    >
+      Selected Inventory: {{ directory.path }}
     </div>
     <div class="col text-center" style="font-size: 50px">pSSID Web GUI</div>
     <hr />
@@ -13,7 +16,7 @@
         <b-tabs fill>
           <b-tab
             :title="pluralize(tab)"
-            :disabled="tab != 'Directory' && directory.path == undefined"
+            :disabled="tab != 'Inventory' && directory.path == undefined"
             v-for="(tab, index) in tablist"
             :key="tab"
             v-on:click="tabHandler(index)"
@@ -180,7 +183,7 @@ export default Vue.extend({
   data: function () {
     return {
       tablist: [
-        "Directory",
+        "Inventory",
         "Host",
         "Group",
         "Schedule",
