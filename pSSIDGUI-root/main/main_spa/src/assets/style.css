@@ -45,13 +45,13 @@
 }
 
 #refresh-button, #refresh-button-group, #refresh-button-task, #refresh-button-schedule{
-    margin-top: 5%;
+    margin-bottom: 5%;
     width: auto;
     float:right;
 }
 
 #add-node-button, #add-group-button, #add-task-button, #add-schedule-button{
-    margin-top: 5%;
+    margin-bottom: 5%;
     margin-right: 5%;
     float:left;
     flex-grow:1;

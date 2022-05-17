@@ -11,6 +11,29 @@
           placeholder="Search..."
         />
       </div>
+      <div class="node-button-container">
+        <button
+          id="add-node-button"
+          class="btn btn-success"
+          style="display: inline-block"
+          v-on:click="addNode"
+        >
+          Add {{ tab }}
+        </button>
+
+        <button
+          id="refresh-button"
+          class="btn btn-primary"
+          style="display: inline-block"
+          v-on:click="refresh_nodes()"
+        >
+          <span
+            class="material-icons"
+            style="font-size: 18px; vertical-align: -3px"
+            >refresh</span
+          >
+        </button>
+      </div>
       <div id="inner-node-list-container">
         <div class="list list-group" id="inner-node-list" role="tablist">
           <div
@@ -24,7 +47,9 @@
             style="display: block; cursor: pointer"
             @click="nodeButtonHandler(index)"
           >
-            <span v-if="filename == 'directory'" class="name">{{ node[listData[0]] }}</span>
+            <span v-if="filename == 'directory'" class="name">{{
+              node[listData[0]]
+            }}</span>
             <span v-else class="name">{{ node[listData[0]] }}</span
             ><br /><span class="IP">{{ node[listData[1]] }}</span>
             <span :class="'dot bg-' + node.status"></span>
@@ -45,29 +70,6 @@
             </a>
           </div>
         </div>
-      </div>
-      <div class="node-button-container">
-        <button
-          id="add-node-button"
-          class="btn btn-success"
-          style="display: inline-block"
-          v-on:click="addNode"
-        >
-          Add {{ tab }}
-        </button>
-        
-        <button
-          id="refresh-button"
-          class="btn btn-primary"
-          style="display: inline-block"
-          v-on:click="refresh_nodes()"
-        >
-          <span
-            class="material-icons"
-            style="font-size: 18px; vertical-align: -3px"
-            >refresh</span
-          >
-        </button>
       </div>
     </div>
 
@@ -136,15 +138,14 @@ export default Vue.extend({
   },
   methods: {
     submitEditHost(node) {
-      if (Date.now() - this.lastCall < 100){
+      if (Date.now() - this.lastCall < 100) {
         // for some reason when a nodePicker was used
         // this was firing twice and would replace both
         // the selected node and the first one in the list
         // please forgive me for my sins
-        return
-      }
-      else{
-        this.lastCall = Date.now()
+        return;
+      } else {
+        this.lastCall = Date.now();
       }
       var url = "/submit/";
       var data = node;
@@ -259,9 +260,9 @@ export default Vue.extend({
       this.showEdit = true;
       this.$emit("nodePicked", this.activeNode);
     },
-    pluralize(word : String): String{
-      return this.$pluralize(word)
-    }
+    pluralize(word: String): String {
+      return this.$pluralize(word);
+    },
   },
   mounted() {},
   components: {
