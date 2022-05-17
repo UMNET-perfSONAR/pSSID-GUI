@@ -26,7 +26,7 @@
               <node-vue
                 v-model="directories"
                 v-if="activeIndex == 0"
-                :listData="['name', 'path']"
+                :listData="['name']"
                 filename="directory"
                 @refresh="refresh"
                 :tab="tab"

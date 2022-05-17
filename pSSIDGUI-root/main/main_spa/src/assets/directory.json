@@ -8,16 +8,5 @@
         "placeholder": "Name...",
         "label": "Name"
       }
-    }
-  ,
-    {
-      "slot": "path",
-      "componentname": "custom-input",
-      "props": {
-        "title": "path",
-        "placeholder": "Path...",
-        "label": "Path"
-      }
-    }
-  
+    }  
 ]

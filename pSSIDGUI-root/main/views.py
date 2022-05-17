@@ -554,7 +554,7 @@ def submit_inventory(request, data, action):
     if action == "delete":
         return HttpResponse(status="405") # Method Not Allowed
 
-    submitted_path = get_absolute_inventory_path(data["path"])
+    submitted_path = get_absolute_inventory_path(data["name"])
 
     # generate missing attributes
     if data.get("id") is None:
@@ -568,7 +568,7 @@ def submit_inventory(request, data, action):
 
     # edit is essentially a rename
     if action == "edit":
-        inventory_to_rename = get_absolute_inventory_path(request.session["directories"][node_id]["path"])
+        inventory_to_rename = get_absolute_inventory_path(request.session["directories"][node_id]["name"])
 
         if inventory_to_rename.exists():
             inventory_to_rename.rename(submitted_path)

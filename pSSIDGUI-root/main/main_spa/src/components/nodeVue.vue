@@ -24,7 +24,7 @@
             style="display: block; cursor: pointer"
             @click="nodeButtonHandler(index)"
           >
-            <span v-if="filename == 'directory'" class="name">{{ node.created ? node[listData[0]] + ' (created)' : node[listData[0]] + ' (loaded)' }}</span>
+            <span v-if="filename == 'directory'" class="name">{{ node[listData[0]] }}</span>
             <span v-else class="name">{{ node[listData[0]] }}</span
             ><br /><span class="IP">{{ node[listData[1]] }}</span>
             <span :class="'dot bg-' + node.status"></span>
