@@ -560,7 +560,6 @@ def submit_inventory(request, data, action):
     if data.get("id") is None:
         data["id"] = len(request.session["directories"])
     node_id = data.get("id")
-    created = True
 
     # if it already exists, don't overwrite
     if submitted_path.exists():
@@ -572,7 +571,6 @@ def submit_inventory(request, data, action):
 
         if inventory_to_rename.exists():
             inventory_to_rename.rename(submitted_path)
-            data["created"] = False
             request.session["directories"][node_id] = data
             request.session.modified = True
             return JsonResponse(data, safe=False)
@@ -580,7 +578,6 @@ def submit_inventory(request, data, action):
 
     # not edit, not delete, so this is an add
     shutil.copytree(str(DEFAULT_INVENTORY), str(submitted_path))
-    data["created"] = True
     request.session["directories"].append(data)
     request.session.modified = True
     return JsonResponse(data, safe=False)
@@ -809,12 +806,8 @@ def get_inventories(request, token):
 
     for index, inventory in enumerate(INVENTORIES_DIRECTORY.iterdir()):
         request.session["directories"].append({
-            # TODO: name should be removed in the future,
-            # don't know how much of frontend relies on it
             "name": inventory.name,
-            "path": inventory.name,
-            "id": index,
-            "created": False
+            "id": index
         })
 
     return JsonResponse({

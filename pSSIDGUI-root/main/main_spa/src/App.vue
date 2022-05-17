@@ -3,9 +3,9 @@
   <div>
     <div
       style="position: absolute; left: 2em; top: 2em"
-      v-if="directory.path"
+      v-if="directory.name"
     >
-      Selected Inventory: {{ directory.path }}
+      Selected Inventory: {{ directory.name }}
     </div>
     <div class="col text-center" style="font-size: 50px">pSSID Web GUI</div>
     <hr />
@@ -16,7 +16,7 @@
         <b-tabs fill>
           <b-tab
             :title="pluralize(tab)"
-            :disabled="tab != 'Inventory' && directory.path == undefined"
+            :disabled="tab != 'Inventory' && directory.name == undefined"
             v-for="(tab, index) in tablist"
             :key="tab"
             v-on:click="tabHandler(index)"
@@ -218,7 +218,7 @@ export default Vue.extend({
     tabHandler(index) {
       this.activeIndex = index;
     },
-    refresh(directory = this.directory.path) {
+    refresh(directory = this.directory.name) {
       this.$refs.tabs.style.display = "none";
       this.$refs.loader.style.display = "block";
       Vue.axios
@@ -281,7 +281,7 @@ export default Vue.extend({
     },
     directoryHandler(node) {
       this.directory = node;
-      this.refresh(node.path);
+      this.refresh(node.name);
     },
     pluralize(word : String): String{
       return this.$pluralize(word)
