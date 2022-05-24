@@ -354,12 +354,10 @@ export default Vue.extend({
     hosts: {
       // when a new host is created add it to the all group
       handler(newval, oldval) {
-        if (newval.length == oldval.length + 1) {
-          for (var item of this.groups) {
-            if (item.name == "all") {
-              item.nodes.push(newval[newval.length - 1].ip);
-              return;
-            }
+        for (var item of this.groups) {
+          if (item.name == "all") {
+            item.nodes = newval.map(host => host.ip);
+            return;
           }
         }
       },

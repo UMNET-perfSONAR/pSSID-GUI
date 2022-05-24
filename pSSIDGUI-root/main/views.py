@@ -45,123 +45,93 @@ def replaceByKeyVal(x, key, val, newdata):
             x[i] = newdata
             return
 
-def hosts_add(ip, group, request):
-    # add a host to hosts.ini
-    with open(request.session["directory"] + "/hosts", "r") as f:
-        f.seek(0)
-        contents = f.readlines()
-        contents.insert(contents.index("[" + group + "]\n") + 1, ip + "\n")
+def hosts_add(address, group, request):
 
-    with open(request.session["directory"] + "/hosts", "w") as f:
-        f.seek(0)
-        f.write("".join(contents))
+    with open(request.session["directory"] + "/hosts.yml", "r") as f:
+        hosts_yml = yaml.safe_load(f)
 
+    if group not in hosts_yml:
+        raise HttpResponse("Cannot add host to group that doesn't exist", status="400")
 
-def hosts_remove(ip, request):
-    # remove a host from hosts.ini
-    with open(request.session["directory"] + "/hosts", "r") as f:
-        f.seek(0)
-        count = 0
-        contents = f.readlines()
-        for line in contents:
-            if line == ip + "\n":
-                contents.pop(count)
-            count += 1
+    if hosts_yml[group]["hosts"] is None:
+        hosts_yml[group]["hosts"] = {}
+    hosts_yml[group]["hosts"][address] = None
 
-    with open(request.session["directory"] + "/hosts", "w") as f:
-        f.seek(0)
-        f.write("".join(contents))
+    with open(request.session["directory"] + "/hosts.yml", "w") as f:
+        yaml.dump(hosts_yml, f, indent=2, sort_keys=False)
 
 
-def hosts_edit(oldip, newip, request):
-    # edit the name of a host in hosts.ini
-    with open(request.session["directory"] + "/hosts", "r") as f:
-        f.seek(0)
-        count = 0
-        contents = f.readlines()
-        for line in contents:
-            if line == oldip + "\n":
-                contents[count] = newip + "\n"
-                continue
-            count += 1
+def hosts_remove(address, request):
 
-    with open(request.session["directory"] + "/hosts", "w") as f:
-        f.seek(0)
-        f.write("".join(contents))
+    with open(request.session["directory"] + "/hosts.yml", "r") as f:
+        hosts_yml = yaml.safe_load(f)
+    
+    for group_name, group_content in hosts_yml.items():
+        group_content["hosts"].pop(address, None)
+
+    with open(request.session["directory"] + "/hosts.yml", "w") as f:
+        yaml.dump(hosts_yml, f, indent=2, sort_keys=False)
+
+# change the ip address of a host
+def hosts_edit(old_address, new_address, request):
+
+    with open(request.session["directory"] + "/hosts.yml", "r") as f:
+        hosts_yml = yaml.safe_load(f)
+    
+    # `copy` is to avoid `RuntimeError: dictionary keys changed during iteration`
+    for group_name, group_content in hosts_yml.copy().items():
+        for host_name, host_content in group_content["hosts"].copy().items():
+            if host_name == old_address:
+                hosts_yml[group_name]["hosts"][new_address] = hosts_yml[group_name]["hosts"].pop(old_address)
+
+    with open(request.session["directory"] + "/hosts.yml", "w") as f:
+        yaml.dump(hosts_yml, f, indent=2, sort_keys=False)
 
 
+# add a group to hosts.yml
 def group_add(group, request):
-    # add a group to hosts.ini
-    with open(request.session["directory"] + "/hosts", "a") as f:
-        f.write("\n[" + group + "]\n")
+
+    with open(request.session["directory"] + "/hosts.yml", "r") as f:
+        hosts_yml = yaml.load(f, Loader=SafeLoader)
+
+    hosts_yml[group] = { "hosts": {} }
+    
+    with open(request.session["directory"] + "/hosts.yml", "w") as f:
+        yaml.dump(hosts_yml, f, indent=2, sort_keys=False)
 
 
+# remove a group from hosts.yml
 def group_remove(group, request):
-    # remove a group from hosts.ini
-    with open(request.session["directory"] + "/hosts", "r") as f:
-        f.seek(0)
 
-        contents = f.readlines()
-        start = contents.index("[" + group + "]\n")
+    with open(request.session["directory"] + "/hosts.yml", "r") as f:
+        hosts_yml = yaml.load(f, Loader=SafeLoader)
 
-        while start < len(contents) and contents[start] != "\n":
+    hosts_yml.pop(group, None)
 
-            contents.pop(start)
+    with open(request.session["directory"] + "/hosts.yml", "w") as f:
+        yaml.dump(hosts_yml, f, indent=2, sort_keys=False)
 
-        # extra \n vvv
-        if start != len(contents):
-            contents.pop(start)
-        else:
-            contents.pop(start-1)
+# change `old_group`'s name to `new_group` and
+# change its list of hosts to `hosts`
+def group_edit(old_group, new_group, hosts, request):
 
-    with open(request.session["directory"] + "/hosts", "w") as f:
-        f.seek(0)
-        f.write("".join(contents))
+    with open(request.session["directory"] + "/hosts.yml", "r") as f:
+        hosts_yml = yaml.load(f, Loader=SafeLoader)
 
+    hosts_yml.pop(old_group, None)
+    hosts_yml[new_group] = {
+        "hosts": dict.fromkeys(hosts, None)
+    }
 
-def group_edit(oldgroup, new_group, hosts, request):
-    # edit the name of a group from hosts.ini
-    with open(request.session["directory"] + "/hosts", "r") as f:
-        f.seek(0)
-        contents = f.readlines()
-        start = contents.index("[" + oldgroup + "]\n")
-        contents[start] = "[" + new_group + "]\n"
-        start += 1
-        for host in hosts:
-            if start == len(contents) or contents[start] == "\n":
-                contents.insert(start, host + "\n")
-            else:
-                contents[start] = host + "\n"
-            start += 1
-        while start < len(contents) and contents[start] != "\n":
-            contents.pop(start)
-    with open(request.session["directory"] + "/hosts", "w") as f:
-        f.seek(0)
-        f.write("".join(contents))
+    with open(request.session["directory"] + "/hosts.yml", "w") as f:
+        yaml.dump(hosts_yml, f, indent=2, sort_keys=False)
 
 
 def make_node(name, ip, meta, node_id):
-    # construct a host from arguments, pings pscheduler to check if a host is online
-    # (yes i know it says node im sorry)
-    try:
-        response = requests.get("https://" + ip + "/pscheduler", verify=False)
 
-        if response.ok:
-            tests = requests.get(
-                "https://" + ip + "/pscheduler/tests", verify=False).json()
-            archivers = requests.get(
-                "https://" + ip + "/pscheduler/archivers", verify=False).json()
-            new_node = {"name": name, "ip": ip, "meta": meta, "status": bootstrap_bg(
-                True), "id": node_id, "tests": tests, "archivers": archivers, "tasks": []}
-            # i tried really hard to make this a class but django disagreed please forgive me
-        else:
-            new_node = {"name": name, "ip": ip, "meta": meta, "status": bootstrap_bg(
-                False), "id": node_id, "tests": [], "archivers": [], "tasks": []}
-        return new_node
-    except Exception:
-        new_node = {"name": name, "ip": ip, "meta": meta, "status": bootstrap_bg(
-            False), "id": node_id, "tests": [], "archivers": [], "tasks": []}
-        return new_node
+    new_node = {"name": name, "ip": ip, "meta": meta, "status": bootstrap_bg(
+            True), "id": node_id, "tests": [], "archivers": [], "tasks": []}
+    return new_node
 
 
 def submit_host(request, data, action):
@@ -179,7 +149,7 @@ def submit_host(request, data, action):
         node_id = response.get("id")
     name = response["name"]
     ip = response["ip"]
-    meta = response["meta"]
+    meta = response.get("meta", [])
     tasks = response["tasks"]
     try:
 
@@ -195,7 +165,7 @@ def submit_host(request, data, action):
             for i in request.session["hosts"]:
                 if i["name"] == name:
                     return HttpResponse(status="503")
-            os.mkdir(request.session["directory"] + "/host_vars/" + ip)
+            Path(request.session["directory"] + "/host_vars/" + ip).mkdir(parents=True)
             hosts_add(ip, "all", request)
             request.session["hosts"].append(new_node)
 
@@ -248,9 +218,6 @@ def submit_group(request, data, action):
     nodes = response["nodes"]
     meta = response["meta"]
     tasks = response["tasks"]
-    if not set(nodes).issubset(set(i["ip"] for i in request.session["hosts"])):
-        # security check i guess? this is kinda stupid idk why i included it
-        return HttpResponse(status="403")
     new_group = {"name": name, "nodes": nodes, "meta": meta, "id": node_id, "tasks": tasks}
     try:
 
@@ -847,93 +814,91 @@ def get_inventory(request, token):
     tasks = []
     testnames = []
     archivernames = []
-    with open(request.session["directory"] + "/hosts", "r") as f:
-        f.seek(0)
+
+    with open(request.session["directory"] + "/hosts.yml", "r") as f:
+        hosts_yml = yaml.safe_load(f)
         group_id = 0
-        seenset = set()
-        for line in f.readlines():
-            if line[0] != '#' and ':' not in line and line != "\n":
+        
+        for group, group_content in hosts_yml.items():
 
-                if line[0] == '[' and line[-2] == ']':  # if group
-                    currentgroup = line[1:-2]
+            currentgroup = group
 
+            with open(request.session["directory"] + "/group_vars/" + currentgroup + "/meta.yml", "r") as f:
+                yamlfile = yaml.load(f, Loader=SafeLoader)
+                meta = yamlfile["meta"]
+            with open(request.session["directory"] + "/group_vars/" + currentgroup + "/tasks.yml", "r") as f:
+                yamlfile = yaml.load(f, Loader=SafeLoader)
+                new_tasks = [i["name"] for i in yamlfile["tasks"]]
+            groups.append(
+                {"name": currentgroup, "nodes": [], "id": group_id, "meta": meta, "tasks": new_tasks})
 
-                    with open(request.session["directory"] + "/group_vars/" + currentgroup + "/meta.yml", "r") as f:
-                        yamlfile = yaml.load(f, Loader=SafeLoader)
-                        meta = yamlfile["meta"]
-                    with open(request.session["directory"] + "/group_vars/" + currentgroup + "/tasks.yml", "r") as f:
-                        yamlfile = yaml.load(f, Loader=SafeLoader)
-                        new_tasks = [i["name"] for i in yamlfile["tasks"]]
-                    groups.append(
-                        {"name": currentgroup, "nodes": [], "id": group_id, "meta": meta, "tasks": new_tasks})
+            with open(request.session["directory"] + "/group_vars/" + currentgroup + "/tasks.yml", "r") as f:
+                yamlfile = yaml.load(f, Loader=SafeLoader)
+                new_tasks = yamlfile["tasks"]
+                # tasks += [{**{"name": i["name"], "id": task_id}, **
+                            # i} for i in new_tasks if i["name"] not in [j["name"] for j in tasks]]
+                # task_id += 1
+                for i in new_tasks:
+                    if i["name"] not in [j["name"] for j in tasks]:
+                        tasks.append({**{"id": task_id}, **i})
+                        task_id += 1
+            try:
+                os.mkdir(
+                    request.session["directory"] + "/group_vars/" + currentgroup)
+            except FileExistsError as e:
+                print("Ignored error: " + str(e))
 
-                    with open(request.session["directory"] + "/group_vars/" + currentgroup + "/tasks.yml", "r") as f:
-                        yamlfile = yaml.load(f, Loader=SafeLoader)
-                        new_tasks = yamlfile["tasks"]
-                        # tasks += [{**{"name": i["name"], "id": task_id}, **
-                                    # i} for i in new_tasks if i["name"] not in [j["name"] for j in tasks]]
+            group_id += 1
+
+            if group_content["hosts"] is None:
+                hosts_entry = {}
+            else:
+                hosts_entry = group_content["hosts"]
+
+            for host in hosts_entry:
+                ip = host
+                try:
+
+                    with open(request.session["directory"] + "/host_vars/"
+                                + ip + "/pssid_conf.yml", "r") as f:
+                        f.seek(0)
+                        new_node = {}
+                        # try:
+                            # new_node = yaml.load(f, Loader=SafeLoader)
+                        # except json.decoder.JSONDecodeError:
+                        new_node = yaml.load(f, Loader=SafeLoader)
+                        new_node["id"] = node_id
+                        # tasks += [{**{"name": i, "id": task_id}, **
+                        #            i} for i in new_node["tasks"]]
                         # task_id += 1
-                        for i in new_tasks:
+                        for i in new_node["tasks"]:
                             if i["name"] not in [j["name"] for j in tasks]:
                                 tasks.append({**{"id": task_id}, **i})
                                 task_id += 1
-                    try:
-                        os.mkdir(
-                            request.session["directory"] + "/group_vars/" + currentgroup)
-                    except FileExistsError as e:
-                        print(e)
-                        print(traceback.format_exc())
 
-                    group_id += 1
+                        testnames += [
+                            {"name": i.split("/")[-1]} for i in new_node["tests"]]
+                        archivernames += [
+                                {"name": i.split("/")[-1]} for i in new_node["archivers"]]
 
-                else:  # else host name
-                    if line[:-1] in seenset:
-                        groups[-1]["nodes"].append(line[:-1])
-                    else:
-                        ip = line[:-1]
-                        try:
+                        test_id += 1
+                        new_node["tasks"] = [i["name"] for i in new_node["tasks"]]
+                        
+                        with open(request.session["directory"] + "/host_vars/"
+                                + ip + "/meta.yml", "r") as f2:
+                            meta = yaml.load(f2, Loader=SafeLoader)
+                            meta["meta"] = [i for i in meta["meta"] if i is not None]
+                            new_node["meta"] = meta["meta"]
 
-                            with open(request.session["directory"] + "/host_vars/"
-                                      + ip + "/pssid_conf.yml", "r") as f:
-                                f.seek(0)
-                                new_node = {}
-                                # try:
-                                    # new_node = yaml.load(f, Loader=SafeLoader)
-                                # except json.decoder.JSONDecodeError:
-                                new_node = yaml.load(f, Loader=SafeLoader)
-                                new_node["id"] = node_id
-                                # tasks += [{**{"name": i, "id": task_id}, **
-                                #            i} for i in new_node["tasks"]]
-                                # task_id += 1
-                                for i in new_node["tasks"]:
-                                    if i["name"] not in [j["name"] for j in tasks]:
-                                        tasks.append({**{"id": task_id}, **i})
-                                        task_id += 1
+                        # this is to avoid adding the same host from two different groups
+                        # to the same host list multiple times
+                        if all(host_candidate["name"] != new_node["name"] for host_candidate in hosts):
+                            hosts.append(new_node)
+                except Exception as e:
+                    print("Ignored error: " + str(e))
 
-                                # print(new_node)
-                                testnames += [
-                                    {"name": i.split("/")[-1]} for i in new_node["tests"]]
-                                archivernames += [
-                                        {"name": i.split("/")[-1]} for i in new_node["archivers"]]
-
-                                test_id += 1
-                                new_node["tasks"] = [i["name"] for i in new_node["tasks"]]
-                                
-                                with open(request.session["directory"] + "/host_vars/"
-                                      + ip + "/meta.yml", "r") as f2:
-                                    meta = yaml.load(f2, Loader=SafeLoader)
-                                    meta["meta"] = [i for i in meta["meta"] if i is not None]
-                                    new_node["meta"] = meta["meta"]
-                                    print(new_node)
-                                hosts.append(new_node)
-                        except Exception as e:
-                            print(e)
-                            print(traceback.format_exc())
-
-                        seenset.add(line[:-1])
-                        # groups[0]["nodes"].append(node_id)
-                        groups[-1]["nodes"].append(line[:-1])
-                        node_id += 1
+                groups[-1]["nodes"].append(host)
+                node_id += 1
 
     with open(request.session["directory"] + "/group_vars/all/schedules.yml") as f:
         f.seek(0)
