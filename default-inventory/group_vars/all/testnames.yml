@@ -1,1 +1,71 @@
-[]
+[
+    {
+        "name": "amsterdam"
+    },
+    {
+        "name": "clock"
+    },
+    {
+        "name": "disk-to-disk"
+    },
+    {
+        "name": "dns"
+    },
+    {
+        "name": "example"
+    },
+    {
+        "name": "foo"
+    },
+    {
+        "name": "http"
+    },
+    {
+        "name": "idle"
+    },
+    {
+        "name": "idlebgm"
+    },
+    {
+        "name": "idleex"
+    },
+    {
+        "name": "latency"
+    },
+    {
+        "name": "latencybg"
+    },
+    {
+        "name": "netreach"
+    },
+    {
+        "name": "rtt"
+    },
+    {
+        "name": "s3throughput"
+    },
+    {
+        "name": "simplestream"
+    },
+    {
+        "name": "snmpget"
+    },
+    {
+        "name": "snmpgetbgm"
+    },
+    {
+        "name": "snmpset"
+    },
+    {
+        "name": "test"
+    },
+    {
+        "name": "throughput"
+    },
+    {
+        "name": "trace"
+    },
+    {
+        "name": "xxx"
+    }
+]

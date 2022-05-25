@@ -1,1 +1,8 @@
-[]
+[
+    {
+        "name": "rabbitmq"
+    },
+    {
+        "name": "syslog"
+    }
+]

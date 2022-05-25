@@ -876,11 +876,6 @@ def get_inventory(request, token):
                                 tasks.append({**{"id": task_id}, **i})
                                 task_id += 1
 
-                        testnames += [
-                            {"name": i.split("/")[-1]} for i in new_node["tests"]]
-                        archivernames += [
-                                {"name": i.split("/")[-1]} for i in new_node["archivers"]]
-
                         test_id += 1
                         new_node["tasks"] = [i["name"] for i in new_node["tasks"]]
                         
@@ -1040,30 +1035,14 @@ def get_inventory(request, token):
             for extrakey in i["extra"]:
                 i["meta"].append({extrakey: i["spec"][extrakey]})
                 i["spec"].pop(extrakey, None)
-                
-            # i["meta"] = []
-        # yamlfile = [{**{"id": index, "name": list(i.keys())[0]}, **list(i.values())[
-        #     0]} for index, i in enumerate(yamlfile)]
 
         archivers = yamlfile
 
-    with open(request.session["directory"] + "/group_vars/all/testnames.yml", "w") as f:
-        yaml.dump(testnames, f, indent=2, sort_keys=False)
-    with open(request.session["directory"] + "/group_vars/all/archivernames.yml", "w") as f:
-        yaml.dump(archivernames, f, indent=2, sort_keys=False)
-    # try:
-    #     for directory in os.listdir(hostvardir):
-    #         with open(hostvardir + directory + "/pssid_conf.yml") as f:
-    #             yamlfile = yaml.load(f, Loader = SafeLoader)
-    #             for task in yamlfile["tasks"]:
-    #                 tasks.append({**{"name": task}, **yamlfile["tasks"][task]})
-    #     for directory in os.listdir(groupvardir):
-    #         with open(groupvardir + directory + "/tasks.yml") as f:
-    #             yamlfile = yaml.load(f, Loader = SafeLoader)
-    #             for task in yamlfile["tasks"]:
-    #                 tasks.append({**{"name": task}, **yamlfile["tasks"][task]})
-    # except Exception as e:
-    #
+    with open(request.session["directory"] + "/group_vars/all/testnames.yml", "r") as f:
+        testnames = yaml.load(f, Loader=SafeLoader)
+
+    with open(request.session["directory"] + "/group_vars/all/archivernames.yml", "r") as f:
+        archivernames = yaml.load(f, Loader=SafeLoader)
 
     request.session["hosts"] = hosts
     request.session["groups"] = groups
