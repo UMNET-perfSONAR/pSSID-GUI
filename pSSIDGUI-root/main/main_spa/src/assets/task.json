@@ -37,16 +37,16 @@
       }
       ,
       {
-        "slot": "tests",
+        "slot": "jobs",
         "componentname": "node-picker",
         "props": {
-          "title": "tests",
+          "title": "jobs",
           "listData": ["name"],
           "keyname": "name",
-          "label": "Test",
+          "label": "Job",
           "optional": true
         },
-        "extraData": {"list": "tests"}
+        "extraData": {"list": "jobs"}
       }
       ,
       {

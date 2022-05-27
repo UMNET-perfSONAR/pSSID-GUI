@@ -561,8 +561,7 @@ def submit_task(request, data, action):
         if data.get("id") is None:
             data["id"] = len(request.session["tasks"])
         node_id = data.get("id")
-        print(request.session["tasks"][node_id])
-        with open(request.session["directory"] + "/group_vars/all/task_list.yml") as f:
+        with open(request.session["directory"] + "/group_vars/all/tasks.yml") as f:
             yamlfile = yaml.load(f, Loader=SafeLoader)
             yamlfile = yamlfile["tasks"]
             if action == "add":
@@ -656,7 +655,7 @@ def submit_task(request, data, action):
                     print(e)
                     print(traceback.format_exc())
 
-            with open(request.session["directory"] + "/group_vars/all/task_list.yml", "w") as f:
+            with open(request.session["directory"] + "/group_vars/all/tasks.yml", "w") as f:
                 yaml.dump({"tasks": yamlfile}, f, indent=2, sort_keys=False)
             request.session.modified = True
             print(data)
@@ -665,6 +664,33 @@ def submit_task(request, data, action):
         print(e)
         print(traceback.format_exc())
 
+
+def submit_job(request, data, action):
+    if data.get("id") is None:
+        data["id"] = len(request.session["jobs"])
+
+    with open(request.session["directory"] + "/group_vars/all/jobs.yml", "r") as f:
+        jobs = yaml.load(f, Loader=SafeLoader)
+    jobs = jobs["jobs"]
+
+    if action == "edit" or action == "delete":
+        # remove any that already exists with this name
+        jobs = [job for job in jobs if job["id"] != data["id"]]
+        request.session["jobs"] \
+            = [job for job in request.session["jobs"] if job["id"] != data["id"]]
+    
+    if action == "edit" or action == "add":
+        # add this job in as long as it doesn't already exist
+        if any(job["name"] == data["name"] for job in jobs) \
+            or any(job["name"] == data["name"] for job in request.session["jobs"]):
+            return HttpResponse(status="403")
+
+        request.session["jobs"].append(data)
+        jobs.append(data)
+
+    with open(request.session["directory"] + "/group_vars/all/jobs.yml", "w") as f:
+        yaml.dump({"jobs": jobs}, f, indent=2, sort_keys=False)
+    return JsonResponse(data, safe=False)
 
 def submit_test(request, data, action):
 
@@ -952,9 +978,6 @@ def get_inventory(request, token):
 
         for index, i in enumerate(yamlfile):
             i["id"] = index
-            i["nodes"] = i.pop("profiles")
-        # yamlfile = [{"id": index, "name": list(i.keys())[0], "nodes": list(i.values())[
-        #     0]} for index, i in enumerate(yamlfile)]
 
         ssid_groups = yamlfile
 
@@ -993,14 +1016,9 @@ def get_inventory(request, token):
     # this adds the inventories to `request.session["directories"]`
     get_inventories(request, token)
 
-    # with open("rtt.json") as f:
-    #     rttjson = yaml.load(f, Loader=SafeLoader)
-    #     tests.append({"name": "rtt", "spec": rttjson})
+    with open(request.session["directory"] + "/group_vars/all/jobs.yml", "r") as f:
+        jobs = yaml.load(f, Loader=SafeLoader)["jobs"]
 
-    with open(request.session["directory"] + "/group_vars/all/task_list.yml", "w") as f:
-        # yaml.dump(dict(zip([i["name"] for i in tasks], [
-        #     {i: d[i] for i in d if i != "name"} for d in tasks])), f, indent=2, sort_keys=False)
-        yaml.dump({"tasks": tasks}, f, indent=2, sort_keys=False)
     with open(request.session["directory"] + "/group_vars/all/tests.yml", "r") as f:
         f.seek(0)
         fileread = f.read()
@@ -1053,6 +1071,7 @@ def get_inventory(request, token):
     request.session["network_interfaces"] = network_interfaces
     request.session["bssid_scans"] = bssid_scans
     request.session["archivers"] = archivers
+    request.session["jobs"] = jobs
     request.session["tests"] = tests
     request.session["tasks"] = tasks
     request.session["testnames"] = testnames
@@ -1071,6 +1090,7 @@ def get_inventory(request, token):
         "bssid_scans": bssid_scans,
         "archivers": archivers,
         "tests": tests,
+        "jobs": jobs,
         "tasks": tasks,
         "directories": request.session["directories"],
         "testnames": testnames,
@@ -1107,6 +1127,8 @@ def submit(request):
         return submit_archiver(request, data, action)
     if tab == "test":
         return submit_test(request, data, action)
+    if tab == "job":
+        return submit_job(request, data, action)
     if tab == "task":
         return submit_task(request, data, action)
     if tab == "directory":

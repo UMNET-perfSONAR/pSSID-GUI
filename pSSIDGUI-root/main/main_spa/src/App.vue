@@ -140,8 +140,18 @@
             </div>
             <div v-if="index == 11">
               <node-vue
-                v-model="tasks"
+                v-model="jobs"
                 v-if="activeIndex == 11"
+                :listData="['name']"
+                :filename="'job'"
+                @refresh="refresh"
+                :tab="tab"
+              ></node-vue>
+            </div>
+            <div v-if="index == 12">
+              <node-vue
+                v-model="tasks"
+                v-if="activeIndex == 12"
                 :listData="['name']"
                 :filename="'task'"
                 @refresh="refresh"
@@ -194,6 +204,7 @@ export default Vue.extend({
         "BSSID Scan",
         "Archiver",
         "Test",
+        "Job",
         "Task",
       ],
       activeIndex: 0,
@@ -207,6 +218,7 @@ export default Vue.extend({
       bssid_scans: [],
       archivers: [],
       tests: [],
+      jobs: [],
       tasks: [],
       directories: [],
       directory: {path: null, id: null},
