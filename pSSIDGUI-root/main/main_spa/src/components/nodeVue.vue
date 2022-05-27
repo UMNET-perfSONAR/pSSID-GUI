@@ -56,7 +56,8 @@
             <a
               id="remove-button"
               :class="
-                tab == 'Group' && node.name == 'all'
+                (tab == 'Group' && node.name == 'all')
+                  || tab == 'Inventory'
                   ? 'btn btn-danger btn-sm disabled'
                   : 'btn btn-danger btn-sm'
               "
