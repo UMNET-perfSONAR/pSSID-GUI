@@ -155,7 +155,7 @@ export default Vue.extend({
       for (var item of this.jsonFields) {
         item.props.initvalue = null;
         item.props.disabled = null;
-        if (this.isAll && item.slot != "tasks") {
+        if (this.isAll && item.slot != "batches") {
           item.props.disabled = true;
         }
       }

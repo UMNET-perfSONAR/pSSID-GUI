@@ -150,10 +150,10 @@
             </div>
             <div v-if="index == 12">
               <node-vue
-                v-model="tasks"
+                v-model="batches"
                 v-if="activeIndex == 12"
                 :listData="['name']"
-                :filename="'task'"
+                :filename="'batch'"
                 @refresh="refresh"
                 :tab="tab"
               ></node-vue>
@@ -205,7 +205,7 @@ export default Vue.extend({
         "Archiver",
         "Test",
         "Job",
-        "Task",
+        "Batch",
       ],
       activeIndex: 0,
       hosts: [],
@@ -219,7 +219,7 @@ export default Vue.extend({
       archivers: [],
       tests: [],
       jobs: [],
-      tasks: [],
+      batches: [],
       directories: [],
       directory: {path: null, id: null},
       testnames: [],
