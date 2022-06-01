@@ -572,13 +572,7 @@ def submit_batch(request, data, action):
                 # yamlfile[name] = dataout
                 yamlfile.append(dataout)
             elif action == "edit":
-                # yamlfile.pop(request.session["batches"][node_id]["name"])
-                # yamlfile[name] = dataout
-                print(request.session["batches"][node_id]["name"])
-                print("test")
-                print(yamlfile)
                 replaceByKeyVal(yamlfile, "name", request.session["batches"][node_id]["name"], dataout)
-                print(yamlfile)
                 
                 try:
                     hostvardir = request.session["directory"] + \
@@ -590,11 +584,6 @@ def submit_batch(request, data, action):
                             yamlfile2 = yaml.load(f2, Loader=SafeLoader)
 
                             yamlfile2["batches"] = [data if batch["name"] == request.session["batches"][node_id]["name"] else batch for batch in yamlfile2["batches"]]
-                            print(yamlfile2["batches"])
-                            # for batch in batches:
-                            #     if batch["name"] == name:
-                            #         batch = data
-
                                     
                             f2.seek(0)
                             yaml.dump(yamlfile2, f2, indent=2,
@@ -633,21 +622,19 @@ def submit_batch(request, data, action):
 
                             yamlfile2 = yaml.load(f2, Loader=SafeLoader)
 
-                            for batch in yamlfile2["batches"]:
+                            yamlfile2["batches"] = \
+                                [batch for batch in yamlfile2["batches"] if batch["name"] != name]
 
-                                if batch == name:
-                                    yamlfile2["batches"].pop(batch)
-                                    break
                         with open(hostvardir + directory + "/pssid_conf.yml", "w") as f2:
                             yaml.dump(yamlfile2, f2, indent=2,
                                       sort_keys=False)
                     for directory in os.listdir(groupvardir):
                         with open(groupvardir + directory + "/batches.yml", "r") as f2:
                             yamlfile2 = yaml.load(f2, Loader=SafeLoader)
-                            for batch in yamlfile2["batches"]:
-                                if batch == name:
-                                    yamlfile2["batches"].pop(batch)
-                                    break
+
+                            yamlfile2["batches"] = \
+                                [batch for batch in yamlfile2["batches"] if batch["name"] != name]
+                        
                         with open(groupvardir + directory + "/batches.yml", "w") as f2:
                             yaml.dump(yamlfile2, f2, indent=2,
                                       sort_keys=False)
