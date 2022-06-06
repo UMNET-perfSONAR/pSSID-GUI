@@ -130,7 +130,7 @@ def group_edit(old_group, new_group, hosts, request):
 def make_node(name, ip, meta, node_id):
 
     new_node = {"name": name, "ip": ip, "meta": meta, "status": bootstrap_bg(
-            True), "id": node_id, "tests": [], "archivers": [], "batches": []}
+            True), "id": node_id, "host_batches": []}
     return new_node
 
 
@@ -150,58 +150,48 @@ def submit_host(request, data, action):
     name = response["name"]
     ip = response["ip"]
     meta = response.get("meta", [])
-    batches = response["batches"]
-    try:
 
-        new_node = make_node(name, ip, meta, node_id)
-        new_node.pop("meta")
-        # new_node["batches"] = batches
-        # new_node["batches"] = dict(zip([i for i in batches], [
-        #     {i: d[i] for i in d if i != "name"} for d in
-        #     request.session["batches"] if d["name"] in batches]))
-        new_node["batches"] = [{i:d[i] for i in d if i!='id'} for d in request.session["batches"] if d["name"] in data["batches"]]
-        
-        if action == "add":
-            for i in request.session["hosts"]:
-                if i["name"] == name:
-                    return HttpResponse(status="503")
-            Path(request.session["directory"] + "/host_vars/" + ip).mkdir(parents=True)
-            hosts_add(ip, "all", request)
-            request.session["hosts"].append(new_node)
+    new_node = make_node(name, ip, meta, node_id)
+    new_node.pop("meta")
+    new_node["host_batches"] = response["batches"]
+    
+    if action == "add":
+        for i in request.session["hosts"]:
+            if i["name"] == name:
+                return HttpResponse(status="503")
+        Path(request.session["directory"] + "/host_vars/" + ip).mkdir(parents=True)
+        hosts_add(ip, "all", request)
+        request.session["hosts"].append(new_node)
 
-        elif action == "edit":
-            oldip = request.session["hosts"][node_id]["ip"]
-            os.rename(request.session["directory"] + "/host_vars/" +
-                      oldip, request.session["directory"] + "/host_vars/" + ip)
-            hosts_edit(oldip, ip, request)
-            request.session["hosts"][node_id] = new_node
+    elif action == "edit":
+        oldip = request.session["hosts"][node_id]["ip"]
+        os.rename(request.session["directory"] + "/host_vars/" +
+                    oldip, request.session["directory"] + "/host_vars/" + ip)
+        hosts_edit(oldip, ip, request)
+        request.session["hosts"][node_id] = new_node
 
-        elif action == "delete":
-            shutil.rmtree(
-                request.session["directory"] + "/host_vars/" + ip)
-            hosts_remove(ip, request)
-            i = 0
-            while i < len(request.session["hosts"]):
-                if request.session["hosts"][i]["id"] == node_id:
-                    request.session["hosts"].pop(i)
-                    continue
-                i += 1
-            request.session.modified = True
-            return JsonResponse({"success": True})
-
-        with open(request.session["directory"] + "/host_vars/" + ip + "/pssid_conf.yml", "w") as f:
-            f.seek(0)
-            yaml.dump(new_node, f, indent=2, sort_keys=False)
-        with open(request.session["directory"] + "/host_vars/" + ip + "/meta.yml", "w") as f:
-            f.seek(0)
-            yaml.dump({"meta": meta}, f, indent=2, sort_keys=False)
-
+    elif action == "delete":
+        shutil.rmtree(
+            request.session["directory"] + "/host_vars/" + ip)
+        hosts_remove(ip, request)
+        i = 0
+        while i < len(request.session["hosts"]):
+            if request.session["hosts"][i]["id"] == node_id:
+                request.session["hosts"].pop(i)
+                continue
+            i += 1
         request.session.modified = True
-        new_node["batches"] = batches
-        return JsonResponse(new_node, safe=False)
-    except Exception as e:
-        print(e)
-        print(traceback.format_exc())
+        return JsonResponse({"success": True})
+
+    with open(request.session["directory"] + "/host_vars/" + ip + "/pssid_conf.yml", "w") as f:
+        f.seek(0)
+        yaml.dump(new_node, f, indent=2, sort_keys=False)
+    with open(request.session["directory"] + "/host_vars/" + ip + "/meta.yml", "w") as f:
+        f.seek(0)
+        yaml.dump({"meta": meta}, f, indent=2, sort_keys=False)
+
+    request.session.modified = True
+    return JsonResponse(new_node, safe=False)
 
 
 def submit_group(request, data, action):
@@ -218,24 +208,23 @@ def submit_group(request, data, action):
     nodes = response["nodes"]
     meta = response["meta"]
     batches = response["batches"]
-    new_group = {"name": name, "nodes": nodes, "meta": meta, "id": node_id, "batches": batches}
+    batches_key = f"{name}_batches"
+    new_group = {"name": name, "nodes": nodes, "meta": meta, "id": node_id, f"{name}_batches": batches}
     try:
 
         if action == "add":
             for i in request.session["groups"]:
                 if i["name"] == name:
                     return HttpResponse(status="503")
-            os.mkdir(request.session["directory"] + "/group_vars/" + name)
-            # new_batches = dict(zip([i for i in data["batches"]], [
-            #     {i: d[i] for i in d if i != "name"} for d in
-            #     request.session["batches"] if d["name"] in data["batches"]]))
-            new_batches = [{i:d[i] for i in d if i!='id'} for d in request.session["batches"] if d["name"] in data["batches"]]
+
+            Path(request.session["directory"] + "/group_vars/" + name).mkdir(parents=True,exist_ok=True)
+
+            new_batches = data["batches"]
 
             with open(request.session["directory"] + "/group_vars/" + name + "/meta.yml", "w") as f:
                 yaml.dump({"meta": new_group["meta"]}, f, indent=2, sort_keys=False)
             with open(request.session["directory"] + "/group_vars/" + name + "/batches.yml", "w") as f:
-
-                yaml.dump({"batches": new_batches}, f, indent=2, sort_keys=False)
+                yaml.dump({batches_key: new_batches}, f, indent=2, sort_keys=False)
             group_add(name, request)
             request.session["groups"].append(new_group)
             for host in new_group["nodes"]:
@@ -244,20 +233,14 @@ def submit_group(request, data, action):
 
         elif action == "edit":
             oldname = request.session["groups"][node_id]["name"]
-            # new_batches = dict(zip([i for i in data["batches"]], [
-            #     {i: d[i] for i in d if i != "name"} for d in
-            #     request.session["batches"] if d["name"] in data["batches"]]))
-            new_batches = [{i:d[i] for i in d if i!='id'} for d in request.session["batches"] if d["name"] in data["batches"]]
-
-
+            new_batches = data["batches"]
 
             os.rename(request.session["directory"] + "/group_vars/" +
                       oldname, request.session["directory"] + "/group_vars/" + name)
             with open(request.session["directory"] + "/group_vars/" + name + "/meta.yml", "w") as f:
                 yaml.dump({"meta": new_group["meta"]}, f, indent=2, sort_keys=False)
             with open(request.session["directory"] + "/group_vars/" + name + "/batches.yml", "w") as f:
-
-                yaml.dump({"batches": new_batches}, f, indent=2, sort_keys=False)
+                yaml.dump({batches_key: new_batches}, f, indent=2, sort_keys=False)
             group_edit(oldname, name, nodes, request)
             request.session["groups"][node_id] = new_group
 
@@ -552,104 +535,109 @@ def submit_inventory(request, data, action):
 
 def submit_batch(request, data, action):
 
-    try:
-        name = data["name"]
-        dataout = copy(data)
-        if "id" in dataout:
-            dataout.pop("id", None)
-        # dataout.pop("name")
-        if data.get("id") is None:
-            data["id"] = len(request.session["batches"])
-        node_id = data.get("id")
-        with open(request.session["directory"] + "/group_vars/all/batches.yml") as f:
-            yamlfile = yaml.load(f, Loader=SafeLoader)
-            yamlfile = yamlfile["batches"]
-            if action == "add":
-                for i in request.session["batches"]:
-                    if i["name"] == name:
-                        return HttpResponse(status="503")
-                request.session["batches"].append(data)
-                # yamlfile[name] = dataout
-                yamlfile.append(dataout)
-            elif action == "edit":
-                replaceByKeyVal(yamlfile, "name", request.session["batches"][node_id]["name"], dataout)
+    name = data["name"]
+    dataout = copy(data)
+    if "id" in dataout:
+        dataout.pop("id", None)
+    # dataout.pop("name")
+    if data.get("id") is None:
+        data["id"] = len(request.session["batches"])
+    node_id = data.get("id")
+
+    # add the batch to the global batch_definitions
+    with open(request.session["directory"] + "/group_vars/all/batch_definitions.yml") as batch_defs_file:
+        batch_defs_yml = yaml.load(batch_defs_file, Loader=SafeLoader)
+        batch_defs_yml = batch_defs_yml["batches"]
+        if action == "add":
+            for i in request.session["batches"]:
+                if i["name"] == name:
+                    return HttpResponse(status="503")
+            # add the batch to django session and ansible yaml
+            request.session["batches"].append(dataout)
+            batch_defs_yml.append(dataout)
+        elif action == "edit":
+            new_name = dataout["name"]
+            old_name = request.session["batches"][node_id]["name"]
+
+            # update the batch in the django session
+            replaceByKeyVal(batch_defs_yml, "name", old_name, dataout)
+            
+            hostvardir = request.session["directory"] + \
+                "/host_vars/"
+            groupvardir = request.session["directory"] + \
+                "/group_vars/"
+            
+            # update the batches listed in the host_vars
+            for directory in os.listdir(hostvardir):
+                with open(hostvardir + directory + "/pssid_conf.yml", "r") as hosts_yml_file:
+                    hosts_yml = yaml.load(hosts_yml_file, Loader=SafeLoader)
+
+                    try:
+                        hosts_yml["host_batches"].remove(old_name)
+                        hosts_yml["host_batches"].append(new_name)
+                    except ValueError: pass
+
+                with open(hostvardir + directory + "/pssid_conf.yml", "w") as hosts_yml_file:
+                    yaml.dump(hosts_yml, hosts_yml_file, indent=2,
+                                sort_keys=False)
+            
+            # update the batches listed in groups
+            for directory in [i["name"] for i in request.session["groups"]]:
+                with open(groupvardir + directory + "/batches.yml", "r") as groups_yml_file:
+                    groups_yml = yaml.load(groups_yml_file, Loader=SafeLoader)
+                    batches_key = f"{directory}_batches"
+
+                    try:
+                        groups_yml[batches_key].remove(old_name)
+                        groups_yml[batches_key].append(new_name)
+                    except ValueError: pass
+
+                with open(groupvardir + directory + "/batches.yml", "w") as groups_yml_file:
+                    yaml.dump(groups_yml, groups_yml_file, indent=2,
+                                sort_keys=False)
+
+            request.session["batches"][node_id] = data
+
+        elif action == "delete":
+            request.session["batches"].pop(node_id)
+
+            removeByKeyVal(batch_defs_yml, "name", name)
+            hostvardir = request.session["directory"] + \
+                "/host_vars/"
+            groupvardir = request.session["directory"] + \
+                "/group_vars/"
+
+            # remove from host_vars
+            for directory in os.listdir(hostvardir):
+                with open(hostvardir + directory + "/pssid_conf.yml", "r") as hosts_yml_file:
+
+                    hosts_yml = yaml.load(hosts_yml_file, Loader=SafeLoader)
+
+                    try: hosts_yml["host_batches"].remove(name)
+                    except ValueError: pass # fine if not present
+
+                with open(hostvardir + directory + "/pssid_conf.yml", "w") as hosts_yml_file:
+                    yaml.dump(hosts_yml, hosts_yml_file, indent=2,
+                                sort_keys=False)
+
+            # remove from group_vars
+            for directory in os.listdir(groupvardir):
+                with open(groupvardir + directory + "/batches.yml", "r") as groups_yml_file:
+                    batches_key = f"{directory}_batches"
+
+                    groups_yml = yaml.load(groups_yml_file, Loader=SafeLoader)
+
+                    try: groups_yml[batches_key].remove(name)
+                    except ValueError: pass # fine if not present
                 
-                try:
-                    hostvardir = request.session["directory"] + \
-                        "/host_vars/"
-                    groupvardir = request.session["directory"] + \
-                        "/group_vars/"
-                    for directory in os.listdir(hostvardir):
-                        with open(hostvardir + directory + "/pssid_conf.yml", "r+") as f2:
-                            yamlfile2 = yaml.load(f2, Loader=SafeLoader)
+                with open(groupvardir + directory + "/batches.yml", "w") as groups_yml_file:
+                    yaml.dump(groups_yml, groups_yml_file, indent=2,
+                                sort_keys=False)
 
-                            yamlfile2["batches"] = [data if batch["name"] == request.session["batches"][node_id]["name"] else batch for batch in yamlfile2["batches"]]
-                                    
-                            f2.seek(0)
-                            yaml.dump(yamlfile2, f2, indent=2,
-                                      sort_keys=False)
-                    
-                    # for directory in os.listdir(groupvardir):
-                    for directory in [i["name"] for i in request.session["groups"]]:
-                        with open(groupvardir + directory + "/batches.yml", "r+") as f2:
-                            yamlfile2 = yaml.load(f2, Loader=SafeLoader)
-                            # for batch in yamlfile2["batches"]:
-                            #     if batch["name"] == name:
-                            #         batch = data
-                            print("groups")
-                            print(yamlfile2)
-                            yamlfile2["batches"] = [data if batch["name"] == request.session["batches"][node_id]["name"] else batch for batch in yamlfile2["batches"]]
-                            print(yamlfile2)
-                            f2.seek(0)
-                            yaml.dump(yamlfile2, f2, indent=2,
-                                      sort_keys=False)
-                except Exception as e:
-                    print(e)
-                    print(traceback.format_exc())
-                request.session["batches"][node_id] = data
-
-            elif action == "delete":
-                request.session["batches"].pop(node_id)
-                # yamlfile.pop(name, None)
-                removeByKeyVal(yamlfile, "name", name)
-                try:
-                    hostvardir = request.session["directory"] + \
-                        "/host_vars/"
-                    groupvardir = request.session["directory"] + \
-                        "/group_vars/"
-                    for directory in os.listdir(hostvardir):
-                        with open(hostvardir + directory + "/pssid_conf.yml", "r") as f2:
-
-                            yamlfile2 = yaml.load(f2, Loader=SafeLoader)
-
-                            yamlfile2["batches"] = \
-                                [batch for batch in yamlfile2["batches"] if batch["name"] != name]
-
-                        with open(hostvardir + directory + "/pssid_conf.yml", "w") as f2:
-                            yaml.dump(yamlfile2, f2, indent=2,
-                                      sort_keys=False)
-                    for directory in os.listdir(groupvardir):
-                        with open(groupvardir + directory + "/batches.yml", "r") as f2:
-                            yamlfile2 = yaml.load(f2, Loader=SafeLoader)
-
-                            yamlfile2["batches"] = \
-                                [batch for batch in yamlfile2["batches"] if batch["name"] != name]
-                        
-                        with open(groupvardir + directory + "/batches.yml", "w") as f2:
-                            yaml.dump(yamlfile2, f2, indent=2,
-                                      sort_keys=False)
-                except Exception as e:
-                    print(e)
-                    print(traceback.format_exc())
-
-            with open(request.session["directory"] + "/group_vars/all/batches.yml", "w") as f:
-                yaml.dump({"batches": yamlfile}, f, indent=2, sort_keys=False)
-            request.session.modified = True
-            print(data)
-            return JsonResponse(data, safe=False)
-    except Exception as e:
-        print(e)
-        print(traceback.format_exc())
+        with open(request.session["directory"] + "/group_vars/all/batch_definitions.yml", "w") as batch_defs_file:
+            yaml.dump({"batches": batch_defs_yml}, batch_defs_file, indent=2, sort_keys=False)
+        request.session.modified = True
+        return JsonResponse(data, safe=False)
 
 
 def submit_job(request, data, action):
@@ -832,6 +820,13 @@ def get_inventory(request, token):
         hosts_yml = yaml.safe_load(f)
         group_id = 0
         
+        # gather the global batches into the response
+        with open(request.session["directory"] + "/group_vars/all/batch_definitions.yml", "r") as f:
+            batch_defs_yml = yaml.load(f, Loader=SafeLoader)
+            batches = batch_defs_yml["batches"]
+            for i, batch in enumerate(batches):
+                batch["id"] = i
+
         for group, group_content in hosts_yml.items():
 
             currentgroup = group
@@ -840,26 +835,13 @@ def get_inventory(request, token):
                 yamlfile = yaml.load(f, Loader=SafeLoader)
                 meta = yamlfile["meta"]
             with open(request.session["directory"] + "/group_vars/" + currentgroup + "/batches.yml", "r") as f:
-                yamlfile = yaml.load(f, Loader=SafeLoader)
-                new_batches = [i["name"] for i in yamlfile["batches"]]
+                group_batches_yml = yaml.load(f, Loader=SafeLoader)
+                batches_key = f"{group}_batches"
+                new_batches = group_batches_yml[batches_key]
             groups.append(
                 {"name": currentgroup, "nodes": [], "id": group_id, "meta": meta, "batches": new_batches})
 
-            with open(request.session["directory"] + "/group_vars/" + currentgroup + "/batches.yml", "r") as f:
-                yamlfile = yaml.load(f, Loader=SafeLoader)
-                new_batches = yamlfile["batches"]
-                # batches += [{**{"name": i["name"], "id": batch_id}, **
-                            # i} for i in new_batches if i["name"] not in [j["name"] for j in batches]]
-                # batch_id += 1
-                for i in new_batches:
-                    if i["name"] not in [j["name"] for j in batches]:
-                        batches.append({**{"id": batch_id}, **i})
-                        batch_id += 1
-            try:
-                os.mkdir(
-                    request.session["directory"] + "/group_vars/" + currentgroup)
-            except FileExistsError as e:
-                print("Ignored error: " + str(e))
+            Path(request.session["directory"] + "/group_vars/" + currentgroup).mkdir(parents=True,exist_ok=True)
 
             group_id += 1
 
@@ -870,40 +852,28 @@ def get_inventory(request, token):
 
             for host in hosts_entry:
                 ip = host
-                try:
 
+                with open(request.session["directory"] + "/host_vars/"
+                            + ip + "/pssid_conf.yml", "r") as f:
+                    f.seek(0)
+                    new_node = {}
+
+                    new_node = yaml.load(f, Loader=SafeLoader)
+                    new_node["id"] = node_id
+                    new_node["batches"] = new_node.pop("host_batches")
+
+                    test_id += 1
+                    
                     with open(request.session["directory"] + "/host_vars/"
-                                + ip + "/pssid_conf.yml", "r") as f:
-                        f.seek(0)
-                        new_node = {}
-                        # try:
-                            # new_node = yaml.load(f, Loader=SafeLoader)
-                        # except json.decoder.JSONDecodeError:
-                        new_node = yaml.load(f, Loader=SafeLoader)
-                        new_node["id"] = node_id
-                        # batches += [{**{"name": i, "id": batch_id}, **
-                        #            i} for i in new_node["batches"]]
-                        # batch_id += 1
-                        for i in new_node["batches"]:
-                            if i["name"] not in [j["name"] for j in batches]:
-                                batches.append({**{"id": batch_id}, **i})
-                                batch_id += 1
+                            + ip + "/meta.yml", "r") as f2:
+                        meta = yaml.load(f2, Loader=SafeLoader)
+                        meta["meta"] = [i for i in meta["meta"] if i is not None]
+                        new_node["meta"] = meta["meta"]
 
-                        test_id += 1
-                        new_node["batches"] = [i["name"] for i in new_node["batches"]]
-                        
-                        with open(request.session["directory"] + "/host_vars/"
-                                + ip + "/meta.yml", "r") as f2:
-                            meta = yaml.load(f2, Loader=SafeLoader)
-                            meta["meta"] = [i for i in meta["meta"] if i is not None]
-                            new_node["meta"] = meta["meta"]
-
-                        # this is to avoid adding the same host from two different groups
-                        # to the same host list multiple times
-                        if all(host_candidate["name"] != new_node["name"] for host_candidate in hosts):
-                            hosts.append(new_node)
-                except Exception as e:
-                    print("Ignored error: " + str(e))
+                    # this is to avoid adding the same host from two different groups
+                    # to the same host list multiple times
+                    if all(host_candidate["name"] != new_node["name"] for host_candidate in hosts):
+                        hosts.append(new_node)
 
                 groups[-1]["nodes"].append(host)
                 node_id += 1
@@ -1044,10 +1014,10 @@ def get_inventory(request, token):
         archivers = yamlfile
 
     with open(request.session["directory"] + "/group_vars/all/testnames.yml", "r") as f:
-        testnames = yaml.load(f, Loader=SafeLoader)
+        testnames = (yaml.load(f, Loader=SafeLoader))["testnames"]
 
     with open(request.session["directory"] + "/group_vars/all/archivernames.yml", "r") as f:
-        archivernames = yaml.load(f, Loader=SafeLoader)
+        archivernames = (yaml.load(f, Loader=SafeLoader))["archivernames"]
 
     request.session["hosts"] = hosts
     request.session["groups"] = groups

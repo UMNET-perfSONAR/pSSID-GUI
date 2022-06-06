@@ -180,6 +180,8 @@ export default Vue.extend({
           this.showEdit = false;
           this.active_nodes = [];
           this.$emit("input", this.node_list);
+          this.$forceUpdate();
+          this.refresh_nodes();
         });
     },
     submitNewHost(node) {
@@ -213,6 +215,8 @@ export default Vue.extend({
           this.showForm = false;
           this.active_nodes = [];
           this.$emit("input", this.node_list);
+          this.$forceUpdate();
+          this.refresh_nodes();
         })
         .catch((error) => {
           this.$refs.new.$bvToast.show("error-message");
@@ -247,6 +251,8 @@ export default Vue.extend({
           this.showForm = false;
           this.showEdit = false;
           this.$emit("nodePicked", false);
+          this.$forceUpdate();
+          this.refresh_nodes();
         });
       // TODO: confirm button
     },

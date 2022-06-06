@@ -1022,9 +1022,9 @@
     "node-fetch" "^2.6.1"
 
 "@popperjs/core@^2.9.2":
-  "integrity" "sha512-VZMYa7+fXHdwIq1TDhSXoVmSPEGM/aa+6Aiq3nVVJ9bXr24zScr+NlKFKC3iPljA7ho/GAZr+d2jOf5GIRC30Q=="
-  "resolved" "https://registry.npmjs.org/@popperjs/core/-/core-2.9.2.tgz"
-  "version" "2.9.2"
+  "integrity" "sha512-9X2obfABZuDVLCgPK9aX0a/x4jaOEweTTWE2+9sr0Qqqevj2Uv5XorvusThmc9XGYpS9yI+fhh8RTafBtGposw=="
+  "resolved" "https://registry.npmjs.org/@popperjs/core/-/core-2.11.5.tgz"
+  "version" "2.11.5"
 
 "@soda/friendly-errors-webpack-plugin@^1.7.1":
   "integrity" "sha512-RLotfx6k1+nfLacwNCenj7VnTMPxVwYKoGOcffMFoJDKM8tXzBiCN0hMHFJNnoAojduYAsxuiMm0EOMixgiRow=="
