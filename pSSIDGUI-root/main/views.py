@@ -129,7 +129,7 @@ def group_edit(old_group, new_group, hosts, request):
 
 def make_node(name, ip, meta, node_id):
 
-    new_node = {"name": name, "ip": ip, "meta": meta, "status": bootstrap_bg(
+    new_node = {"name": name, "ip": ip, "host_meta": meta, "status": bootstrap_bg(
             True), "id": node_id, "host_batches": []}
     return new_node
 
@@ -152,7 +152,7 @@ def submit_host(request, data, action):
     meta = response.get("meta", [])
 
     new_node = make_node(name, ip, meta, node_id)
-    new_node.pop("meta")
+    new_node.pop("host_meta")
     new_node["host_batches"] = response["batches"]
     
     if action == "add":
@@ -188,7 +188,7 @@ def submit_host(request, data, action):
         yaml.dump(new_node, f, indent=2, sort_keys=False)
     with open(request.session["directory"] + "/host_vars/" + ip + "/meta.yml", "w") as f:
         f.seek(0)
-        yaml.dump({"meta": meta}, f, indent=2, sort_keys=False)
+        yaml.dump({"host_meta": meta}, f, indent=2, sort_keys=False)
 
     request.session.modified = True
     return JsonResponse(new_node, safe=False)
@@ -209,7 +209,8 @@ def submit_group(request, data, action):
     meta = response["meta"]
     batches = response["batches"]
     batches_key = f"{name}_batches"
-    new_group = {"name": name, "nodes": nodes, "meta": meta, "id": node_id, f"{name}_batches": batches}
+    meta_key = f"{name}_meta"
+    new_group = {"name": name, "nodes": nodes, meta_key: meta, "id": node_id, batches_key: batches}
     try:
 
         if action == "add":
@@ -219,12 +220,10 @@ def submit_group(request, data, action):
 
             Path(request.session["directory"] + "/group_vars/" + name).mkdir(parents=True,exist_ok=True)
 
-            new_batches = data["batches"]
-
             with open(request.session["directory"] + "/group_vars/" + name + "/meta.yml", "w") as f:
-                yaml.dump({"meta": new_group["meta"]}, f, indent=2, sort_keys=False)
+                yaml.dump({meta_key: new_group[meta_key]}, f, indent=2, sort_keys=False)
             with open(request.session["directory"] + "/group_vars/" + name + "/batches.yml", "w") as f:
-                yaml.dump({batches_key: new_batches}, f, indent=2, sort_keys=False)
+                yaml.dump({batches_key: new_group[batches_key]}, f, indent=2, sort_keys=False)
             group_add(name, request)
             request.session["groups"].append(new_group)
             for host in new_group["nodes"]:
@@ -233,14 +232,13 @@ def submit_group(request, data, action):
 
         elif action == "edit":
             oldname = request.session["groups"][node_id]["name"]
-            new_batches = data["batches"]
 
             os.rename(request.session["directory"] + "/group_vars/" +
                       oldname, request.session["directory"] + "/group_vars/" + name)
             with open(request.session["directory"] + "/group_vars/" + name + "/meta.yml", "w") as f:
-                yaml.dump({"meta": new_group["meta"]}, f, indent=2, sort_keys=False)
+                yaml.dump({meta_key: new_group[meta_key]}, f, indent=2, sort_keys=False)
             with open(request.session["directory"] + "/group_vars/" + name + "/batches.yml", "w") as f:
-                yaml.dump({batches_key: new_batches}, f, indent=2, sort_keys=False)
+                yaml.dump({batches_key: new_group[batches_key]}, f, indent=2, sort_keys=False)
             group_edit(oldname, name, nodes, request)
             request.session["groups"][node_id] = new_group
 
@@ -832,8 +830,9 @@ def get_inventory(request, token):
             currentgroup = group
 
             with open(request.session["directory"] + "/group_vars/" + currentgroup + "/meta.yml", "r") as f:
-                yamlfile = yaml.load(f, Loader=SafeLoader)
-                meta = yamlfile["meta"]
+                group_meta_yml = yaml.load(f, Loader=SafeLoader)
+                meta_key = f"{group}_meta"
+                meta = group_meta_yml[meta_key]
             with open(request.session["directory"] + "/group_vars/" + currentgroup + "/batches.yml", "r") as f:
                 group_batches_yml = yaml.load(f, Loader=SafeLoader)
                 batches_key = f"{group}_batches"
@@ -867,8 +866,7 @@ def get_inventory(request, token):
                     with open(request.session["directory"] + "/host_vars/"
                             + ip + "/meta.yml", "r") as f2:
                         meta = yaml.load(f2, Loader=SafeLoader)
-                        meta["meta"] = [i for i in meta["meta"] if i is not None]
-                        new_node["meta"] = meta["meta"]
+                        new_node["meta"] = meta["host_meta"]
 
                     # this is to avoid adding the same host from two different groups
                     # to the same host list multiple times
