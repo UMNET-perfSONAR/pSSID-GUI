@@ -30,7 +30,8 @@
         "props": {
             "title": "continue-if",
             "initvalue": null,
-            "label": "Continue\u00A0if…"
+            "label": "Continue\u00A0if…",
+            "optional": true
         }
     }
 ]
