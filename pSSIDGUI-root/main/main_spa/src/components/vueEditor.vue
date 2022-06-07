@@ -65,13 +65,13 @@
 
       <b-button
         v-if="showMetadata"
-        type="button"
+        variant="primary"
         style="width: 100%"
         @click="newMetadata"
         
         >
         <span v-if="filename=='test' || filename=='archiver'">
-          Add Additional Option
+          Add Parameter
         </span>
         <span v-else>
           New Metadata
