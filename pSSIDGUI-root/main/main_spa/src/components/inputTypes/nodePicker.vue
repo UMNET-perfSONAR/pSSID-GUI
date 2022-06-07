@@ -42,7 +42,11 @@
           "
           @click="nodeButtonHandler(index)"
         >
-          <span v-if="node[listData[0]]" class="name">{{
+          <span v-if="node[listData[0]]" class="name">
+              <span v-if="ordered && value.includes(node[listData[0]])">
+                ({{value.indexOf(node[listData[0]]) + 1}})
+              </span>
+          {{
             node[listData[0]]
           }}</span>
           <br />
@@ -78,6 +82,7 @@ export default Vue.extend({
     "label", // label, default is title
     "disabled", // used for the all group
     "optional", // is it optional
+    "ordered" // the order of the selection matters, indices will be shown
   ],
 
   data: function () {
