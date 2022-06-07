@@ -1,0 +1,21 @@
+# concatenates all `*_batches`s and mergers all `*.meta`s
+
+meta: >-
+  {%- set meta={} -%}
+  {%- for group in groups -%}
+    {%- for group_meta_obj in lookup('vars', group + '_meta', default=[{}]) -%}
+      {{ meta.update(group_meta_obj) }}
+    {%- endfor -%}
+  {%- endfor -%}
+  {%- for host_meta_obj in host_meta -%}
+      {{ meta.update(host_meta_obj) }}
+  {%- endfor -%}
+  {{ meta }}
+batch_selection: >-
+  {%- set batch_selection=host_batches -%}
+  {%- for group in groups -%}
+    {%- for group_batch_selection in lookup('vars', group + '_batches', default=[]) -%}
+      {{ batch_selection.append(group_batch_selection) }}
+    {%- endfor -%}
+  {%- endfor -%}
+  {{ batch_selection|unique }}

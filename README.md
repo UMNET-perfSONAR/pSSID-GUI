@@ -20,8 +20,6 @@ Installation:
 
 After building, if no changes were made you can use `./run_dev [IP]:[PORT] to just run the server.
 
-# Docs (to be put in wiki when repo is public)
-
 ## Frontend Structure
 
 ### App.vue
@@ -70,4 +68,10 @@ Use this command to update `sqlite`:
 wget https://kojipkgs.fedoraproject.org//packages/sqlite/3.9.0/1.fc21/x86_64/sqlite-3.9.0-1.fc21.x86_64.rpm
 
 sudo yum install sqlite-3.9.0-1.fc21.x86_64.rpm
+```
+
+## Running the Ansible Playbook
+
+```
+ansible-playbook ./template/playbook.yml -i inventories/name
 ```

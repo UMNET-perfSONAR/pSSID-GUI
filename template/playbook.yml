@@ -1,0 +1,9 @@
+- name: Generate pSSID config file
+  hosts: all
+  connection: local
+  tasks:
+  - name: Generate pSSID config file
+    register: result
+    ansible.builtin.template:
+      src: ./pssid-conf.j2
+      dest: /Users/benton/pssid-configs/{{ ip }}.pssid.json
