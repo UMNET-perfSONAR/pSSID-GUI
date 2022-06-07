@@ -3,7 +3,7 @@
     <b-row>
       <b-col>
         <span class="textlabel text-center"
-          >{{ label ? label : title }} Picker</span
+          >{{ label ? label : title }} Selection</span
         >
       </b-col>
     </b-row>
