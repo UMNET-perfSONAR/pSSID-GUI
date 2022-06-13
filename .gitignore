@@ -5,7 +5,6 @@ inventories
 ## JS
 app.js
 chunk-vendors.js
-package-lock.json
 
 /dist
 /tmp
