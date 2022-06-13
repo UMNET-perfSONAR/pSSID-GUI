@@ -70,8 +70,22 @@ wget https://kojipkgs.fedoraproject.org//packages/sqlite/3.9.0/1.fc21/x86_64/sql
 sudo yum install sqlite-3.9.0-1.fc21.x86_64.rpm
 ```
 
-## Running the Ansible Playbook
+## Provisioning and Running
 
-```
-ansible-playbook --inventory inventories/name --become --become-user root --ask-become-pass --become-method su template/playbook.yml
-```
+Do the following on the system on which you want the web server and Ansible controller hosted:
+
+1. Install Docker using the system package manager.
+1. Start the Docker daemon with `systemctl start docker` as root (assumes a systemd system).
+1. Run `chmod 666 /var/run/docker.sock` to prevent permissions problems.
+1. Install `docker-compose` using the system package manager. Verify installation with `docker-compose -v`.
+    * If the system package manager gives errors, just install the static binary from GitHub Releases [somewhat like this](https://phoenixnap.com/kb/install-docker-compose-centos-7).
+1. Install Ansible using the system package manager. Verify installation with `ansible-playbook -v`.
+1. 
+        git clone https://github.com/UMNET-perfSONAR/pSSID-GUI
+        git checkout fixes
+1. Run `./build_all` to build the Docker container. The web service should be accessible at `host:8080`. Add an inventory and a host there.
+1. Run `ssh-keygen` to generate ssh keys and somehow get the public key to the RPis to which you want to deploy.
+1. Run the following to generate and copy a pSSID configuration for and to each host you have added to your inventory via the web service:
+    ```
+    ansible-playbook --inventory inventories/$(name) --become --become-user root --ask-become-pass --become-method su template/playbook.yml
+    ```
