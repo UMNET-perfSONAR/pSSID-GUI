@@ -1,9 +1,13 @@
 - name: Generate pSSID config file
   hosts: all
-  connection: local
   tasks:
+  - name: Make the pSSID config dir if it doesn't exist
+    file:
+      path: /etc/pssid/pssid-configs
+      # makes it behave like mkdir -p
+      state: directory
   - name: Generate pSSID config file
     register: result
     ansible.builtin.template:
       src: ./pssid-conf.j2
-      dest: /Users/benton/pssid-configs/{{ ip }}.pssid.json
+      dest: /etc/pssid/pssid-configs/{{ ip }}.json

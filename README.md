@@ -73,5 +73,5 @@ sudo yum install sqlite-3.9.0-1.fc21.x86_64.rpm
 ## Running the Ansible Playbook
 
 ```
-ansible-playbook ./template/playbook.yml -i inventories/name
+ansible-playbook --inventory inventories/name --become --become-user root --ask-become-pass --become-method su template/playbook.yml
 ```
