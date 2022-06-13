@@ -23,6 +23,8 @@ ENV SECRET_KEY asdfasdf
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 RUN python3 manage.py collectstatic --no-input
+RUN python3 manage.py makemigrations
+RUN python3 manage.py migrate --run-syncdb
 
 # TODO: build shouldn't occur in the same container being deployed
 # but for now doing so makes reproducing easy with git clone ... && ./build_all

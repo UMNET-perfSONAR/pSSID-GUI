@@ -21,8 +21,8 @@ from pathlib import Path
 
 # TODO: these should be configurable in a config file
 # they should also probably be absolute paths
-INVENTORIES_DIRECTORY = Path("inventories")
-DEFAULT_INVENTORY = Path("default-inventory")
+INVENTORIES_DIRECTORY = Path("inventories").resolve()
+DEFAULT_INVENTORY = Path(__file__).parent.parent.joinpath("default-inventory").resolve()
 
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 

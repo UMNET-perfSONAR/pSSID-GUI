@@ -1,4 +1,4 @@
-version: '3.7'
+version: '2'
 
 services:
   web:
@@ -9,13 +9,13 @@ services:
     env_file:
       - ./.env
     volumes:
-      - ./inventories:/app/inventories
+      - ./inventories:/app/inventories:Z
       # includes ansible inventory
   nginx:
     build: ./nginx
     volumes_from: 
       - web
     ports:
-      - 80:80
+      - 8080:80
     depends_on:
       - web

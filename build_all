@@ -1,4 +1,4 @@
 #!/bin/bash
 set -e
-DOCKER_BUILDKIT=1 docker-compose -f docker-compose.yml up -d --force-recreate --build nginx
+DOCKER_BUILDKIT=0 docker-compose -f docker-compose.yml up -d --force-recreate --build nginx
 
