@@ -181,7 +181,11 @@ export default Vue.extend({
           this.active_nodes = [];
           this.$emit("input", this.node_list);
           this.$forceUpdate();
-          this.refresh_nodes();
+
+          // avoid renaming directory and then
+          // refreshing for the old, nonexistent directory
+          if (this.filename != "directory")
+            this.refresh_nodes();
         });
     },
     submitNewHost(node) {
