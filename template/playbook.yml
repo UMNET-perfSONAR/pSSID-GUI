@@ -1,13 +1,30 @@
 - name: Generate pSSID config file
   hosts: all
   tasks:
-  - name: Make the pSSID config dir if it doesn't exist
+
+
+# remote machine
+  - name: Make the remote pSSID config dir if it doesn't exist
     file:
-      path: /etc/pssid/pssid-configs
+      path: /etc/pssid
       # makes it behave like mkdir -p
       state: directory
-  - name: Generate pSSID config file
-    register: result
+  - name: Generate pSSID config file on target
     ansible.builtin.template:
       src: ./pssid-conf.j2
-      dest: /etc/pssid/pssid-configs/{{ ip }}.json
+      dest: /etc/pssid/config.json
+
+
+# local machine (Ansible controller/web server),
+# essentially a log
+  - name: Make the local pSSID config dir if it doesn't exist
+    file:
+      path: /etc/pssid/configs
+      # makes it behave like mkdir -p
+      state: directory
+    delegate_to: localhost
+  - name: Generate pSSID config file locally
+    ansible.builtin.template:
+      src: ./pssid-conf.j2
+      dest: /etc/pssid/configs/{{ ip }}.json
+    delegate_to: localhost
