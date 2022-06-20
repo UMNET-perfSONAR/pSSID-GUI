@@ -18,10 +18,8 @@ from urllib3.exceptions import InsecureRequestWarning
 import yaml
 from yaml.loader import SafeLoader
 from pathlib import Path
+from .config import INVENTORIES_DIRECTORY
 
-# TODO: these should be configurable in a config file
-# they should also probably be absolute paths
-INVENTORIES_DIRECTORY = Path("inventories").resolve()
 DEFAULT_INVENTORY = Path(__file__).parent.parent.joinpath("default-inventory").resolve()
 
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
