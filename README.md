@@ -85,7 +85,8 @@ Do the following on the system on which you want the web server and Ansible cont
         git checkout fixes
 1. Run `./build_all` to build the Docker container. The web service should be accessible at `host:8080`. Add an inventory and a host there.
 1. Run `ssh-keygen` to generate ssh keys and somehow get the public key to the RPis to which you want to deploy.
+1. Create `ansible/logins.json` containing the SSIDs and passwords that will be copied to the target machines' `/etc/pscheduler/tests` file. Encrypt the file using `ansible-vault encrypt ansible/logins.json` so it can be checked into version control.
 1. Run the following to generate and copy a pSSID configuration for and to each host you have added to your inventory via the web service:
     ```
-    ansible-playbook --inventory inventories/$(name) --become --become-user root --ask-become-pass --become-method su template/playbook.yml
+    ansible-playbook --inventory inventories/$(name) --become --become-user root --ask-become-pass --become-method su ansible/playbook.yml --ask-vault-pass
     ```
