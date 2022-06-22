@@ -1,8 +1,0 @@
-archivernames: [
-    {
-        "name": "rabbitmq"
-    },
-    {
-        "name": "syslog"
-    }
-]
