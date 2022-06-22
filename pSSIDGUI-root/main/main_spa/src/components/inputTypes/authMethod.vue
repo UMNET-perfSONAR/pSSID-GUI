@@ -19,15 +19,6 @@
       @updateFormValues="handleInput"
       class="field"
     ></custom-input>
-    <custom-input
-      title="Password"
-      placeholder="Password..."
-      label="Password"
-      :initvalue="initvalue == null ? null : initvalue['Password']"
-      :isFormReseted="isFormReseted"
-      @updateFormValues="handleInput"
-      class="field"
-    ></custom-input>
     <connection-flags
       title="connection_flags"
       :initvalue="initvalue == null ? null : initvalue['connection_flags']"
@@ -65,7 +56,6 @@ export default Vue.extend({
         value: {
           type: null,
           UID: null,
-          Password: null,
           connection_flags: null
         },
       };
