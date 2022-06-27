@@ -2,23 +2,17 @@
 
 A Web Interface for configuring [pSSID](https://github.com/UMNET-perfSONAR/pSSID) by editing Ansible config files
 
-Requirements: `node >= 10`, `npm`, `python3`, `pip3`
-
-Provided example Ansible directory at `/inventory`
+Requirements: Docker and `docker-compose`/`docker compose`
 
 Built with Vue and Django
 
-Installation:
+Building:
 
-- `pip3 install -r pSSIDGUI-root/requirements.txt`
-
-- `chmod +x build_dev`
-
-- `./build_dev [IP]:[PORT]`: build Vue and host Django dev server at IP:PORT
-
-- MacOS: if you get something like `nodename nor servname provided, or not known`, run `echo 127.0.0.1 $HOSTNAME >> /etc/hosts` as root
-
-After building, if no changes were made you can use `./run_dev [IP]:[PORT] to just run the server.
+```
+PORT=8080 INV_DIR=./inventories docker compose up --build
+# or to build and run in the background:
+PORT=8080 INV_DIR=./inventories docker compose up --build -d
+```
 
 ## Frontend Structure
 

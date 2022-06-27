@@ -6,16 +6,13 @@ services:
     container_name: django
     command: python3 manage.py runserver 0.0.0.0:8000
     expose: [ 8000 ]
-    env_file:
-      - ./.env
     volumes:
-      - ./inventories:/app/inventories:Z
-      # includes ansible inventory
+      - ${INV_DIR}:/app/inventories:Z
   nginx:
     build: ./nginx
     volumes_from: 
       - web
     ports:
-      - 8080:80
+      - ${PORT}:80
     depends_on:
       - web
