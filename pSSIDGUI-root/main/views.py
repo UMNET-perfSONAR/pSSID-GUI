@@ -487,9 +487,9 @@ def submit_bssid_scan(request, data, action):
         print(traceback.format_exc())
 
 def get_absolute_inventory_path(inventory_name):
-    absolute_path = INVENTORIES_DIRECTORY.joinpath(Path(inventory_name))
+    absolute_path = INVENTORIES_DIRECTORY.joinpath(Path(inventory_name)).joinpath("inventory")
     # verify the submitted path didn't escape our inventories directory
-    if absolute_path.parent != INVENTORIES_DIRECTORY:
+    if absolute_path.parent.parent != INVENTORIES_DIRECTORY:
         raise PermissionDenied("Invalid inventory path submitted")
     
     return absolute_path
