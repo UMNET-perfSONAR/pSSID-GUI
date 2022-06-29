@@ -4,7 +4,7 @@ services:
   web:
     build: ./pSSIDGUI-root
     container_name: django
-    command: python3 manage.py runserver 0.0.0.0:8000
+    command: gunicorn pSSIDGUI.wsgi:application --bind 0.0.0.0:8000
     expose: [ 8000 ]
     volumes:
       - ${INV_DIR}:/app/inventories:Z
