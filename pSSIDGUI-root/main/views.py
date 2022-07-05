@@ -516,7 +516,7 @@ def submit_inventory(request, data, action):
         inventory_to_rename = get_absolute_inventory_path(request.session["directories"][node_id]["name"])
 
         if inventory_to_rename.exists():
-            inventory_to_rename.rename(submitted_path)
+            inventory_to_rename.parent.rename(submitted_path.parent)
             request.session["directories"][node_id] = data
             request.session.modified = True
             return JsonResponse(data, safe=False)
