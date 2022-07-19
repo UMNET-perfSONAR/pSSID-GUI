@@ -1,0 +1,102 @@
+[
+            
+    {
+      "slot": "name",
+      "componentname": "custom-input",
+      "props": {
+        "title": "name",
+        "placeholder": "Name...",
+        "initvalue": null,
+        "label": "Name"
+      }
+    }
+  ,
+    {
+      "slot": "profiles",
+      "componentname": "node-picker",
+      "props": {
+        "title": "profiles",
+        "listData": ["name"],
+        "keyname": "name",
+        "label": "Profile"
+      },
+      "extraData": {"list": "ssid_profiles"}
+    }
+    ,
+    {
+        "slot": "BSSIDs",
+        "componentname": "node-picker",
+        "props": {
+          "title": "BSSIDs",
+          "listData": ["name"],
+          "keyname": "name",
+          "label": "BSSID",
+          "single": true
+        },
+        "extraData": {"list": "bssid_scans"}
+      }
+      ,
+      {
+        "slot": "jobs",
+        "componentname": "node-picker",
+        "props": {
+          "title": "jobs",
+          "listData": ["name"],
+          "keyname": "name",
+          "label": "Job",
+          "optional": true,
+          "ordered": true
+        },
+        "extraData": {"list": "jobs"}
+      }
+      ,
+      {
+        "slot": "archivers",
+        "componentname": "node-picker",
+        "props": {
+          "title": "archivers",
+          "listData": ["name"],
+          "keyname": "name",
+          "label": "Archiver",
+          "optional": true
+        },
+        "extraData": {"list": "archivers"}
+      }
+      ,
+      {
+        "slot": "schedule",
+        "componentname": "node-picker",
+        "props": {
+          "title": "schedule",
+          "listData": ["name"],
+          "keyname": "name",
+          "label": "Schedule"
+        },
+        "extraData": {"list": "schedules"}
+      }
+      ,
+      {
+        "slot": "priority",
+        "componentname": "custom-input",
+        "props": {
+          "title": "priority",
+          "placeholder": "Priority...",
+          "initvalue": null,
+          "label": "Priority",
+          "type": "number"
+        }
+      }
+      ,
+      {
+        "slot": "ttl",
+        "componentname": "custom-input",
+        "props": {
+          "title": "ttl",
+          "placeholder": "TTL...",
+          "initvalue": null,
+          "label": "TTL",
+          "type": "number"
+        }
+      }
+  
+]

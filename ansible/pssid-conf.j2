@@ -1,0 +1,14 @@
+{
+    "bssid-scan-definitions": {{ bssid_scans | dictify | to_json }},
+    "archiver-definitions": {{ archivers | dictify | to_json }},
+    "schedule-definitions": {{ schedules | dictify | to_json }},
+    "bssid-channel-definitions": {{ bssid_channels | dictify | to_json }},
+    "ssid-profile-definitions": {{ ssid_profiles | dictify | to_json }},
+    "ssid-group-definitions": {{ ssid_groups | dictify | to_json }},
+    "network-interface-definitions": {{ network_interfaces | dictify | to_json }},
+    "test-definitions": {{ tests | dictify | to_json }},
+    "job-definitions": {{ jobs | dictify | to_json }},
+    "batch-definitions": {{ batches | dictify | to_json }},
+    "meta": {{ meta | to_json }},
+    "batches": {{ batch_selection | to_json }}
+}

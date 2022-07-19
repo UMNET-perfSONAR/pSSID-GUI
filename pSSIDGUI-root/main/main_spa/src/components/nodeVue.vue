@@ -11,6 +11,29 @@
           placeholder="Search..."
         />
       </div>
+      <div class="node-button-container">
+        <button
+          id="add-node-button"
+          class="btn btn-success"
+          style="display: inline-block"
+          v-on:click="addNode"
+        >
+          Add {{ tab }}
+        </button>
+
+        <button
+          id="refresh-button"
+          class="btn btn-primary"
+          style="display: inline-block"
+          v-on:click="refresh_nodes()"
+        >
+          <span
+            class="material-icons"
+            style="font-size: 18px; vertical-align: -3px"
+            >refresh</span
+          >
+        </button>
+      </div>
       <div id="inner-node-list-container">
         <div class="list list-group" id="inner-node-list" role="tablist">
           <div
@@ -24,14 +47,17 @@
             style="display: block; cursor: pointer"
             @click="nodeButtonHandler(index)"
           >
-            <span v-if="filename == 'directory'" class="name">{{ node.created ? node[listData[0]] + ' (created)' : node[listData[0]] + ' (loaded)' }}</span>
+            <span v-if="filename == 'directory'" class="name">{{
+              node[listData[0]]
+            }}</span>
             <span v-else class="name">{{ node[listData[0]] }}</span
             ><br /><span class="IP">{{ node[listData[1]] }}</span>
             <span :class="'dot bg-' + node.status"></span>
             <a
               id="remove-button"
               :class="
-                tab == 'Group' && node.name == 'all'
+                (tab == 'Group' && node.name == 'all')
+                  || tab == 'Inventory'
                   ? 'btn btn-danger btn-sm disabled'
                   : 'btn btn-danger btn-sm'
               "
@@ -45,29 +71,6 @@
             </a>
           </div>
         </div>
-      </div>
-      <div class="node-button-container">
-        <button
-          id="add-node-button"
-          class="btn btn-success"
-          style="display: inline-block"
-          v-on:click="addNode"
-        >
-          Add {{ tab }}
-        </button>
-        
-        <button
-          id="refresh-button"
-          class="btn btn-primary"
-          style="display: inline-block"
-          v-on:click="refresh_nodes()"
-        >
-          <span
-            class="material-icons"
-            style="font-size: 18px; vertical-align: -3px"
-            >refresh</span
-          >
-        </button>
       </div>
     </div>
 
@@ -136,15 +139,14 @@ export default Vue.extend({
   },
   methods: {
     submitEditHost(node) {
-      if (Date.now() - this.lastCall < 100){
+      if (Date.now() - this.lastCall < 100) {
         // for some reason when a nodePicker was used
         // this was firing twice and would replace both
         // the selected node and the first one in the list
         // please forgive me for my sins
-        return
-      }
-      else{
-        this.lastCall = Date.now()
+        return;
+      } else {
+        this.lastCall = Date.now();
       }
       var url = "/submit/";
       var data = node;
@@ -178,6 +180,12 @@ export default Vue.extend({
           this.showEdit = false;
           this.active_nodes = [];
           this.$emit("input", this.node_list);
+          this.$forceUpdate();
+
+          // avoid renaming directory and then
+          // refreshing for the old, nonexistent directory
+          if (this.filename != "directory")
+            this.refresh_nodes();
         });
     },
     submitNewHost(node) {
@@ -211,6 +219,8 @@ export default Vue.extend({
           this.showForm = false;
           this.active_nodes = [];
           this.$emit("input", this.node_list);
+          this.$forceUpdate();
+          this.refresh_nodes();
         })
         .catch((error) => {
           this.$refs.new.$bvToast.show("error-message");
@@ -245,6 +255,8 @@ export default Vue.extend({
           this.showForm = false;
           this.showEdit = false;
           this.$emit("nodePicked", false);
+          this.$forceUpdate();
+          this.refresh_nodes();
         });
       // TODO: confirm button
     },
@@ -259,9 +271,9 @@ export default Vue.extend({
       this.showEdit = true;
       this.$emit("nodePicked", this.activeNode);
     },
-    pluralize(word : String): String{
-      return this.$pluralize(word)
-    }
+    pluralize(word: String): String {
+      return this.$pluralize(word);
+    },
   },
   mounted() {},
   components: {

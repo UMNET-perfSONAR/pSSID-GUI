@@ -9,6 +9,7 @@ import traceback
 
 
 from django.http import HttpResponse
+from django.core.exceptions import PermissionDenied
 from django.http.response import JsonResponse
 from django.template import loader
 from django.middleware.csrf import get_token
@@ -16,7 +17,10 @@ import requests
 from urllib3.exceptions import InsecureRequestWarning
 import yaml
 from yaml.loader import SafeLoader
+from pathlib import Path
 
+DEFAULT_INVENTORY = Path(__file__).parent.parent.joinpath("default-inventory").resolve()
+INVENTORIES_DIRECTORY = Path(__file__).parent.parent.joinpath("inventories").resolve()
 
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
@@ -39,123 +43,93 @@ def replaceByKeyVal(x, key, val, newdata):
             x[i] = newdata
             return
 
-def hosts_add(ip, group, request):
-    # add a host to hosts.ini
-    with open(request.session["directory"] + "/hosts", "r") as f:
-        f.seek(0)
-        contents = f.readlines()
-        contents.insert(contents.index("[" + group + "]\n") + 1, ip + "\n")
+def hosts_add(address, group, request):
 
-    with open(request.session["directory"] + "/hosts", "w") as f:
-        f.seek(0)
-        f.write("".join(contents))
+    with open(request.session["directory"] + "/hosts.yml", "r") as f:
+        hosts_yml = yaml.safe_load(f)
 
+    if group not in hosts_yml:
+        raise HttpResponse("Cannot add host to group that doesn't exist", status="400")
 
-def hosts_remove(ip, request):
-    # remove a host from hosts.ini
-    with open(request.session["directory"] + "/hosts", "r") as f:
-        f.seek(0)
-        count = 0
-        contents = f.readlines()
-        for line in contents:
-            if line == ip + "\n":
-                contents.pop(count)
-            count += 1
+    if hosts_yml[group]["hosts"] is None:
+        hosts_yml[group]["hosts"] = {}
+    hosts_yml[group]["hosts"][address] = None
 
-    with open(request.session["directory"] + "/hosts", "w") as f:
-        f.seek(0)
-        f.write("".join(contents))
+    with open(request.session["directory"] + "/hosts.yml", "w") as f:
+        yaml.dump(hosts_yml, f, indent=2, sort_keys=False)
 
 
-def hosts_edit(oldip, newip, request):
-    # edit the name of a host in hosts.ini
-    with open(request.session["directory"] + "/hosts", "r") as f:
-        f.seek(0)
-        count = 0
-        contents = f.readlines()
-        for line in contents:
-            if line == oldip + "\n":
-                contents[count] = newip + "\n"
-                continue
-            count += 1
+def hosts_remove(address, request):
 
-    with open(request.session["directory"] + "/hosts", "w") as f:
-        f.seek(0)
-        f.write("".join(contents))
+    with open(request.session["directory"] + "/hosts.yml", "r") as f:
+        hosts_yml = yaml.safe_load(f)
+    
+    for group_name, group_content in hosts_yml.items():
+        group_content["hosts"].pop(address, None)
+
+    with open(request.session["directory"] + "/hosts.yml", "w") as f:
+        yaml.dump(hosts_yml, f, indent=2, sort_keys=False)
+
+# change the ip address of a host
+def hosts_edit(old_address, new_address, request):
+
+    with open(request.session["directory"] + "/hosts.yml", "r") as f:
+        hosts_yml = yaml.safe_load(f)
+    
+    # `copy` is to avoid `RuntimeError: dictionary keys changed during iteration`
+    for group_name, group_content in hosts_yml.copy().items():
+        for host_name, host_content in group_content["hosts"].copy().items():
+            if host_name == old_address:
+                hosts_yml[group_name]["hosts"][new_address] = hosts_yml[group_name]["hosts"].pop(old_address)
+
+    with open(request.session["directory"] + "/hosts.yml", "w") as f:
+        yaml.dump(hosts_yml, f, indent=2, sort_keys=False)
 
 
+# add a group to hosts.yml
 def group_add(group, request):
-    # add a group to hosts.ini
-    with open(request.session["directory"] + "/hosts", "a") as f:
-        f.write("\n[" + group + "]\n")
+
+    with open(request.session["directory"] + "/hosts.yml", "r") as f:
+        hosts_yml = yaml.load(f, Loader=SafeLoader)
+
+    hosts_yml[group] = { "hosts": {} }
+    
+    with open(request.session["directory"] + "/hosts.yml", "w") as f:
+        yaml.dump(hosts_yml, f, indent=2, sort_keys=False)
 
 
+# remove a group from hosts.yml
 def group_remove(group, request):
-    # remove a group from hosts.ini
-    with open(request.session["directory"] + "/hosts", "r") as f:
-        f.seek(0)
 
-        contents = f.readlines()
-        start = contents.index("[" + group + "]\n")
+    with open(request.session["directory"] + "/hosts.yml", "r") as f:
+        hosts_yml = yaml.load(f, Loader=SafeLoader)
 
-        while start < len(contents) and contents[start] != "\n":
+    hosts_yml.pop(group, None)
 
-            contents.pop(start)
+    with open(request.session["directory"] + "/hosts.yml", "w") as f:
+        yaml.dump(hosts_yml, f, indent=2, sort_keys=False)
 
-        # extra \n vvv
-        if start != len(contents):
-            contents.pop(start)
-        else:
-            contents.pop(start-1)
+# change `old_group`'s name to `new_group` and
+# change its list of hosts to `hosts`
+def group_edit(old_group, new_group, hosts, request):
 
-    with open(request.session["directory"] + "/hosts", "w") as f:
-        f.seek(0)
-        f.write("".join(contents))
+    with open(request.session["directory"] + "/hosts.yml", "r") as f:
+        hosts_yml = yaml.load(f, Loader=SafeLoader)
 
+    hosts_yml.pop(old_group, None)
+    hosts_yml[new_group] = {
+        "hosts": dict.fromkeys(hosts, None)
+    }
 
-def group_edit(oldgroup, new_group, hosts, request):
-    # edit the name of a group from hosts.ini
-    with open(request.session["directory"] + "/hosts", "r") as f:
-        f.seek(0)
-        contents = f.readlines()
-        start = contents.index("[" + oldgroup + "]\n")
-        contents[start] = "[" + new_group + "]\n"
-        start += 1
-        for host in hosts:
-            if start == len(contents) or contents[start] == "\n":
-                contents.insert(start, host + "\n")
-            else:
-                contents[start] = host + "\n"
-            start += 1
-        while start < len(contents) and contents[start] != "\n":
-            contents.pop(start)
-    with open(request.session["directory"] + "/hosts", "w") as f:
-        f.seek(0)
-        f.write("".join(contents))
+    with open(request.session["directory"] + "/hosts.yml", "w") as f:
+        yaml.dump(hosts_yml, f, indent=2, sort_keys=False)
 
 
 def make_node(name, ip, meta, node_id):
-    # construct a host from arguments, pings pscheduler to check if a host is online
-    # (yes i know it says node im sorry)
-    try:
-        response = requests.get("https://" + ip + "/pscheduler", verify=False)
 
-        if response.ok:
-            tests = requests.get(
-                "https://" + ip + "/pscheduler/tests", verify=False).json()
-            archivers = requests.get(
-                "https://" + ip + "/pscheduler/archivers", verify=False).json()
-            new_node = {"name": name, "ip": ip, "meta": meta, "status": bootstrap_bg(
-                True), "id": node_id, "tests": tests, "archivers": archivers, "tasks": []}
-            # i tried really hard to make this a class but django disagreed please forgive me
-        else:
-            new_node = {"name": name, "ip": ip, "meta": meta, "status": bootstrap_bg(
-                False), "id": node_id, "tests": [], "archivers": [], "tasks": []}
-        return new_node
-    except Exception:
-        new_node = {"name": name, "ip": ip, "meta": meta, "status": bootstrap_bg(
-            False), "id": node_id, "tests": [], "archivers": [], "tasks": []}
-        return new_node
+    new_node = {"name": name, "ip": ip, "host_meta": meta, "status": bootstrap_bg(
+            True), "id": node_id, "host_batches": []}
+    return new_node
 
 
 def submit_host(request, data, action):
@@ -173,59 +147,49 @@ def submit_host(request, data, action):
         node_id = response.get("id")
     name = response["name"]
     ip = response["ip"]
-    meta = response["meta"]
-    tasks = response["tasks"]
-    try:
+    meta = response.get("meta", [])
 
-        new_node = make_node(name, ip, meta, node_id)
-        new_node.pop("meta")
-        # new_node["tasks"] = tasks
-        # new_node["tasks"] = dict(zip([i for i in tasks], [
-        #     {i: d[i] for i in d if i != "name"} for d in
-        #     request.session["tasks"] if d["name"] in tasks]))
-        new_node["tasks"] = [{i:d[i] for i in d if i!='id'} for d in request.session["tasks"] if d["name"] in data["tasks"]]
-        
-        if action == "add":
-            for i in request.session["hosts"]:
-                if i["name"] == name:
-                    return HttpResponse(status="503")
-            os.mkdir(request.session["directory"] + "/host_vars/" + ip)
-            hosts_add(ip, "all", request)
-            request.session["hosts"].append(new_node)
+    new_node = make_node(name, ip, meta, node_id)
+    new_node.pop("host_meta")
+    new_node["host_batches"] = response["batches"]
+    
+    if action == "add":
+        for i in request.session["hosts"]:
+            if i["name"] == name:
+                return HttpResponse(status="503")
+        Path(request.session["directory"] + "/host_vars/" + ip).mkdir(parents=True)
+        hosts_add(ip, "all", request)
+        request.session["hosts"].append(new_node)
 
-        elif action == "edit":
-            oldip = request.session["hosts"][node_id]["ip"]
-            os.rename(request.session["directory"] + "/host_vars/" +
-                      oldip, request.session["directory"] + "/host_vars/" + ip)
-            hosts_edit(oldip, ip, request)
-            request.session["hosts"][node_id] = new_node
+    elif action == "edit":
+        oldip = request.session["hosts"][node_id]["ip"]
+        os.rename(request.session["directory"] + "/host_vars/" +
+                    oldip, request.session["directory"] + "/host_vars/" + ip)
+        hosts_edit(oldip, ip, request)
+        request.session["hosts"][node_id] = new_node
 
-        elif action == "delete":
-            shutil.rmtree(
-                request.session["directory"] + "/host_vars/" + ip)
-            hosts_remove(ip, request)
-            i = 0
-            while i < len(request.session["hosts"]):
-                if request.session["hosts"][i]["id"] == node_id:
-                    request.session["hosts"].pop(i)
-                    continue
-                i += 1
-            request.session.modified = True
-            return JsonResponse({"success": True})
-
-        with open(request.session["directory"] + "/host_vars/" + ip + "/pssid_conf.yml", "w") as f:
-            f.seek(0)
-            yaml.dump(new_node, f, indent=2, sort_keys=False)
-        with open(request.session["directory"] + "/host_vars/" + ip + "/meta.yml", "w") as f:
-            f.seek(0)
-            yaml.dump({"meta": meta}, f, indent=2, sort_keys=False)
-
+    elif action == "delete":
+        shutil.rmtree(
+            request.session["directory"] + "/host_vars/" + ip)
+        hosts_remove(ip, request)
+        i = 0
+        while i < len(request.session["hosts"]):
+            if request.session["hosts"][i]["id"] == node_id:
+                request.session["hosts"].pop(i)
+                continue
+            i += 1
         request.session.modified = True
-        new_node["tasks"] = tasks
-        return JsonResponse(new_node, safe=False)
-    except Exception as e:
-        print(e)
-        print(traceback.format_exc())
+        return JsonResponse({"success": True})
+
+    with open(request.session["directory"] + "/host_vars/" + ip + "/pssid_conf.yml", "w") as f:
+        f.seek(0)
+        yaml.dump(new_node, f, indent=2, sort_keys=False)
+    with open(request.session["directory"] + "/host_vars/" + ip + "/meta.yml", "w") as f:
+        f.seek(0)
+        yaml.dump({"host_meta": meta}, f, indent=2, sort_keys=False)
+
+    request.session.modified = True
+    return JsonResponse(new_node, safe=False)
 
 
 def submit_group(request, data, action):
@@ -241,28 +205,23 @@ def submit_group(request, data, action):
     name = response["name"]
     nodes = response["nodes"]
     meta = response["meta"]
-    tasks = response["tasks"]
-    if not set(nodes).issubset(set(i["ip"] for i in request.session["hosts"])):
-        # security check i guess? this is kinda stupid idk why i included it
-        return HttpResponse(status="403")
-    new_group = {"name": name, "nodes": nodes, "meta": meta, "id": node_id, "tasks": tasks}
+    batches = response["batches"]
+    batches_key = f"{name}_batches"
+    meta_key = f"{name}_meta"
+    new_group = {"name": name, "nodes": nodes, meta_key: meta, "id": node_id, batches_key: batches}
     try:
 
         if action == "add":
             for i in request.session["groups"]:
                 if i["name"] == name:
                     return HttpResponse(status="503")
-            os.mkdir(request.session["directory"] + "/group_vars/" + name)
-            # new_tasks = dict(zip([i for i in data["tasks"]], [
-            #     {i: d[i] for i in d if i != "name"} for d in
-            #     request.session["tasks"] if d["name"] in data["tasks"]]))
-            new_tasks = [{i:d[i] for i in d if i!='id'} for d in request.session["tasks"] if d["name"] in data["tasks"]]
+
+            Path(request.session["directory"] + "/group_vars/" + name).mkdir(parents=True,exist_ok=True)
 
             with open(request.session["directory"] + "/group_vars/" + name + "/meta.yml", "w") as f:
-                yaml.dump({"meta": new_group["meta"]}, f, indent=2, sort_keys=False)
-            with open(request.session["directory"] + "/group_vars/" + name + "/tasks.yml", "w") as f:
-
-                yaml.dump({"tasks": new_tasks}, f, indent=2, sort_keys=False)
+                yaml.dump({meta_key: new_group[meta_key]}, f, indent=2, sort_keys=False)
+            with open(request.session["directory"] + "/group_vars/" + name + "/batches.yml", "w") as f:
+                yaml.dump({batches_key: new_group[batches_key]}, f, indent=2, sort_keys=False)
             group_add(name, request)
             request.session["groups"].append(new_group)
             for host in new_group["nodes"]:
@@ -271,20 +230,13 @@ def submit_group(request, data, action):
 
         elif action == "edit":
             oldname = request.session["groups"][node_id]["name"]
-            # new_tasks = dict(zip([i for i in data["tasks"]], [
-            #     {i: d[i] for i in d if i != "name"} for d in
-            #     request.session["tasks"] if d["name"] in data["tasks"]]))
-            new_tasks = [{i:d[i] for i in d if i!='id'} for d in request.session["tasks"] if d["name"] in data["tasks"]]
-
-
 
             os.rename(request.session["directory"] + "/group_vars/" +
                       oldname, request.session["directory"] + "/group_vars/" + name)
             with open(request.session["directory"] + "/group_vars/" + name + "/meta.yml", "w") as f:
-                yaml.dump({"meta": new_group["meta"]}, f, indent=2, sort_keys=False)
-            with open(request.session["directory"] + "/group_vars/" + name + "/tasks.yml", "w") as f:
-
-                yaml.dump({"tasks": new_tasks}, f, indent=2, sort_keys=False)
+                yaml.dump({meta_key: new_group[meta_key]}, f, indent=2, sort_keys=False)
+            with open(request.session["directory"] + "/group_vars/" + name + "/batches.yml", "w") as f:
+                yaml.dump({batches_key: new_group[batches_key]}, f, indent=2, sort_keys=False)
             group_edit(oldname, name, nodes, request)
             request.session["groups"][node_id] = new_group
 
@@ -534,181 +486,182 @@ def submit_bssid_scan(request, data, action):
         print(e)
         print(traceback.format_exc())
 
+def get_absolute_inventory_path(inventory_name):
+    absolute_path = INVENTORIES_DIRECTORY.joinpath(Path(inventory_name)).joinpath("inventory")
+    # verify the submitted path didn't escape our inventories directory
+    if absolute_path.parent.parent != INVENTORIES_DIRECTORY:
+        raise PermissionDenied("Invalid inventory path submitted")
+    
+    return absolute_path
 
-def submit_directory(request, data, action):
+def submit_inventory(request, data, action):
 
-    try:
-        path = data["path"]
-        if data.get("id") is None:
-            data["id"] = len(request.session["directories"])
-        node_id = data.get("id")
-        created = False
-        if os.path.isdir(path):
-            dir = os.listdir(path)
-            if len(dir) == 0:
-                os.mkdir(path + "/host_vars")
-                os.mkdir(path + "/group_vars")
-                os.mkdir(path + "/group_vars/all")
-                with open(path + "/hosts", 'w') as f:
-                    f.write("[all]\n")
-                with open(path + "/group_vars/all/archivernames.yml", 'w') as f:
-                    yaml.dump([], f)
-                with open(path + "/group_vars/all/archivers.yml", 'w') as f:
-                    yaml.dump({"archivers": []}, f)
-                with open(path + "/group_vars/all/bssid_channels.yml", 'w') as f:
-                    yaml.dump({"bssid_channels": []}, f)
-                with open(path + "/group_vars/all/bssid_scans.yml", 'w') as f:
-                    yaml.dump({"bssid_scans": []}, f)
-                with open(path + "/group_vars/all/meta.yml", 'w') as f:
-                    yaml.dump({"meta": []}, f)
-                with open(path + "/group_vars/all/network_interfaces.yml", 'w') as f:
-                    yaml.dump({"network_interfaces": []}, f)
-                with open(path + "/group_vars/all/schedules.yml", 'w') as f:
-                    yaml.dump({"schedules": []}, f)
-                with open(path + "/group_vars/all/ssid_groups.yml", 'w') as f:
-                    yaml.dump({"ssid_groups": []}, f)
-                with open(path + "/group_vars/all/ssid_profiles.yml", 'w') as f:
-                    yaml.dump({"ssid_profiles": []}, f)
-                with open(path + "/group_vars/all/task_list.yml", 'w') as f:
-                    yaml.dump({"task_list": []}, f)
-                with open(path + "/group_vars/all/tasks.yml", 'w') as f:
-                    yaml.dump({"tasks": []}, f)
-                with open(path + "/group_vars/all/testnames.yml", 'w') as f:
-                    yaml.dump([], f)
-                with open(path + "/group_vars/all/tests.yml", 'w') as f:
-                    yaml.dump({"tests": []}, f)
-                created = True
-            data["created"] = created
-            if action == "add":
-                request.session["directories"].append(data)
-            elif action == "edit":
-                request.session["directories"][node_id] = data
-            elif action == "delete":
-                request.session["directories"].pop(node_id)
+    # deletes are not permitted
+    if action == "delete":
+        return HttpResponse(status="405") # Method Not Allowed
+
+    submitted_path = get_absolute_inventory_path(data["name"])
+
+    # generate missing attributes
+    if data.get("id") is None:
+        data["id"] = len(request.session["directories"])
+    node_id = data.get("id")
+
+    # if it already exists, don't overwrite
+    if submitted_path.exists():
+        return HttpResponse(status="409") # Conflict
+
+    # edit is essentially a rename
+    if action == "edit":
+        inventory_to_rename = get_absolute_inventory_path(request.session["directories"][node_id]["name"])
+
+        if inventory_to_rename.exists():
+            inventory_to_rename.parent.rename(submitted_path.parent)
+            request.session["directories"][node_id] = data
             request.session.modified = True
-            print(data)
             return JsonResponse(data, safe=False)
-        return HttpResponse(status="403")
-    except Exception as e:
-        print(e)
-        print(traceback.format_exc())
+    # if it doesn't exist, just continue to the add routine
+
+    # not edit, not delete, so this is an add
+    shutil.copytree(str(DEFAULT_INVENTORY), str(submitted_path))
+    request.session["directories"].append(data)
+    request.session.modified = True
+    return JsonResponse(data, safe=False)
 
 
-def submit_task(request, data, action):
+def submit_batch(request, data, action):
 
-    try:
-        name = data["name"]
-        dataout = copy(data)
-        if "id" in dataout:
-            dataout.pop("id", None)
-        # dataout.pop("name")
-        if data.get("id") is None:
-            data["id"] = len(request.session["tasks"])
-        node_id = data.get("id")
-        print(request.session["tasks"][node_id])
-        with open(request.session["directory"] + "/group_vars/all/task_list.yml") as f:
-            yamlfile = yaml.load(f, Loader=SafeLoader)
-            yamlfile = yamlfile["tasks"]
-            if action == "add":
-                for i in request.session["tasks"]:
-                    if i["name"] == name:
-                        return HttpResponse(status="503")
-                request.session["tasks"].append(data)
-                # yamlfile[name] = dataout
-                yamlfile.append(dataout)
-            elif action == "edit":
-                # yamlfile.pop(request.session["tasks"][node_id]["name"])
-                # yamlfile[name] = dataout
-                print(request.session["tasks"][node_id]["name"])
-                print("test")
-                print(yamlfile)
-                replaceByKeyVal(yamlfile, "name", request.session["tasks"][node_id]["name"], dataout)
-                print(yamlfile)
+    name = data["name"]
+    dataout = copy(data)
+    if "id" in dataout:
+        dataout.pop("id", None)
+    # dataout.pop("name")
+    if data.get("id") is None:
+        data["id"] = len(request.session["batches"])
+    node_id = data.get("id")
+
+    # add the batch to the global batch_definitions
+    with open(request.session["directory"] + "/group_vars/all/batch_definitions.yml") as batch_defs_file:
+        batch_defs_yml = yaml.load(batch_defs_file, Loader=SafeLoader)
+        batch_defs_yml = batch_defs_yml["batches"]
+        if action == "add":
+            for i in request.session["batches"]:
+                if i["name"] == name:
+                    return HttpResponse(status="503")
+            # add the batch to django session and ansible yaml
+            request.session["batches"].append(dataout)
+            batch_defs_yml.append(dataout)
+        elif action == "edit":
+            new_name = dataout["name"]
+            old_name = request.session["batches"][node_id]["name"]
+
+            # update the batch in the django session
+            replaceByKeyVal(batch_defs_yml, "name", old_name, dataout)
+            
+            hostvardir = request.session["directory"] + \
+                "/host_vars/"
+            groupvardir = request.session["directory"] + \
+                "/group_vars/"
+            
+            # update the batches listed in the host_vars
+            for directory in os.listdir(hostvardir):
+                with open(hostvardir + directory + "/pssid_conf.yml", "r") as hosts_yml_file:
+                    hosts_yml = yaml.load(hosts_yml_file, Loader=SafeLoader)
+
+                    try:
+                        hosts_yml["host_batches"].remove(old_name)
+                        hosts_yml["host_batches"].append(new_name)
+                    except ValueError: pass
+
+                with open(hostvardir + directory + "/pssid_conf.yml", "w") as hosts_yml_file:
+                    yaml.dump(hosts_yml, hosts_yml_file, indent=2,
+                                sort_keys=False)
+            
+            # update the batches listed in groups
+            for directory in [i["name"] for i in request.session["groups"]]:
+                with open(groupvardir + directory + "/batches.yml", "r") as groups_yml_file:
+                    groups_yml = yaml.load(groups_yml_file, Loader=SafeLoader)
+                    batches_key = f"{directory}_batches"
+
+                    try:
+                        groups_yml[batches_key].remove(old_name)
+                        groups_yml[batches_key].append(new_name)
+                    except ValueError: pass
+
+                with open(groupvardir + directory + "/batches.yml", "w") as groups_yml_file:
+                    yaml.dump(groups_yml, groups_yml_file, indent=2,
+                                sort_keys=False)
+
+            request.session["batches"][node_id] = data
+
+        elif action == "delete":
+            request.session["batches"].pop(node_id)
+
+            removeByKeyVal(batch_defs_yml, "name", name)
+            hostvardir = request.session["directory"] + \
+                "/host_vars/"
+            groupvardir = request.session["directory"] + \
+                "/group_vars/"
+
+            # remove from host_vars
+            for directory in os.listdir(hostvardir):
+                with open(hostvardir + directory + "/pssid_conf.yml", "r") as hosts_yml_file:
+
+                    hosts_yml = yaml.load(hosts_yml_file, Loader=SafeLoader)
+
+                    try: hosts_yml["host_batches"].remove(name)
+                    except ValueError: pass # fine if not present
+
+                with open(hostvardir + directory + "/pssid_conf.yml", "w") as hosts_yml_file:
+                    yaml.dump(hosts_yml, hosts_yml_file, indent=2,
+                                sort_keys=False)
+
+            # remove from group_vars
+            for directory in os.listdir(groupvardir):
+                with open(groupvardir + directory + "/batches.yml", "r") as groups_yml_file:
+                    batches_key = f"{directory}_batches"
+
+                    groups_yml = yaml.load(groups_yml_file, Loader=SafeLoader)
+
+                    try: groups_yml[batches_key].remove(name)
+                    except ValueError: pass # fine if not present
                 
-                try:
-                    hostvardir = request.session["directory"] + \
-                        "/host_vars/"
-                    groupvardir = request.session["directory"] + \
-                        "/group_vars/"
-                    for directory in os.listdir(hostvardir):
-                        with open(hostvardir + directory + "/pssid_conf.yml", "r+") as f2:
-                            yamlfile2 = yaml.load(f2, Loader=SafeLoader)
+                with open(groupvardir + directory + "/batches.yml", "w") as groups_yml_file:
+                    yaml.dump(groups_yml, groups_yml_file, indent=2,
+                                sort_keys=False)
 
-                            yamlfile2["tasks"] = [data if task["name"] == request.session["tasks"][node_id]["name"] else task for task in yamlfile2["tasks"]]
-                            print(yamlfile2["tasks"])
-                            # for task in tasks:
-                            #     if task["name"] == name:
-                            #         task = data
+        with open(request.session["directory"] + "/group_vars/all/batch_definitions.yml", "w") as batch_defs_file:
+            yaml.dump({"batches": batch_defs_yml}, batch_defs_file, indent=2, sort_keys=False)
+        request.session.modified = True
+        return JsonResponse(data, safe=False)
 
-                                    
-                            f2.seek(0)
-                            yaml.dump(yamlfile2, f2, indent=2,
-                                      sort_keys=False)
-                    
-                    # for directory in os.listdir(groupvardir):
-                    for directory in [i["name"] for i in request.session["groups"]]:
-                        with open(groupvardir + directory + "/tasks.yml", "r+") as f2:
-                            yamlfile2 = yaml.load(f2, Loader=SafeLoader)
-                            # for task in yamlfile2["tasks"]:
-                            #     if task["name"] == name:
-                            #         task = data
-                            print("groups")
-                            print(yamlfile2)
-                            yamlfile2["tasks"] = [data if task["name"] == request.session["tasks"][node_id]["name"] else task for task in yamlfile2["tasks"]]
-                            print(yamlfile2)
-                            f2.seek(0)
-                            yaml.dump(yamlfile2, f2, indent=2,
-                                      sort_keys=False)
-                except Exception as e:
-                    print(e)
-                    print(traceback.format_exc())
-                request.session["tasks"][node_id] = data
 
-            elif action == "delete":
-                request.session["tasks"].pop(node_id)
-                # yamlfile.pop(name, None)
-                removeByKeyVal(yamlfile, "name", name)
-                try:
-                    hostvardir = request.session["directory"] + \
-                        "/host_vars/"
-                    groupvardir = request.session["directory"] + \
-                        "/group_vars/"
-                    for directory in os.listdir(hostvardir):
-                        with open(hostvardir + directory + "/pssid_conf.yml", "r") as f2:
+def submit_job(request, data, action):
+    if data.get("id") is None:
+        data["id"] = len(request.session["jobs"])
 
-                            yamlfile2 = yaml.load(f2, Loader=SafeLoader)
+    with open(request.session["directory"] + "/group_vars/all/jobs.yml", "r") as f:
+        jobs = yaml.load(f, Loader=SafeLoader)
+    jobs = jobs["jobs"]
 
-                            for task in yamlfile2["tasks"]:
+    if action == "edit" or action == "delete":
+        # remove any that already exists with this name
+        jobs = [job for job in jobs if job["id"] != data["id"]]
+        request.session["jobs"] \
+            = [job for job in request.session["jobs"] if job["id"] != data["id"]]
+    
+    if action == "edit" or action == "add":
+        # add this job in as long as it doesn't already exist
+        if any(job["name"] == data["name"] for job in jobs) \
+            or any(job["name"] == data["name"] for job in request.session["jobs"]):
+            return HttpResponse(status="403")
 
-                                if task == name:
-                                    yamlfile2["tasks"].pop(task)
-                                    break
-                        with open(hostvardir + directory + "/pssid_conf.yml", "w") as f2:
-                            yaml.dump(yamlfile2, f2, indent=2,
-                                      sort_keys=False)
-                    for directory in os.listdir(groupvardir):
-                        with open(groupvardir + directory + "/tasks.yml", "r") as f2:
-                            yamlfile2 = yaml.load(f2, Loader=SafeLoader)
-                            for task in yamlfile2["tasks"]:
-                                if task == name:
-                                    yamlfile2["tasks"].pop(task)
-                                    break
-                        with open(groupvardir + directory + "/tasks.yml", "w") as f2:
-                            yaml.dump(yamlfile2, f2, indent=2,
-                                      sort_keys=False)
-                except Exception as e:
-                    print(e)
-                    print(traceback.format_exc())
+        request.session["jobs"].append(data)
+        jobs.append(data)
 
-            with open(request.session["directory"] + "/group_vars/all/task_list.yml", "w") as f:
-                yaml.dump({"tasks": yamlfile}, f, indent=2, sort_keys=False)
-            request.session.modified = True
-            print(data)
-            return JsonResponse(data, safe=False)
-    except Exception as e:
-        print(e)
-        print(traceback.format_exc())
-
+    with open(request.session["directory"] + "/group_vars/all/jobs.yml", "w") as f:
+        yaml.dump({"jobs": jobs}, f, indent=2, sort_keys=False)
+    return JsonResponse(data, safe=False)
 
 def submit_test(request, data, action):
 
@@ -807,24 +760,43 @@ def submit_archiver(request, data, action):
         print(e)
         print(traceback.format_exc())
 
+
+def get_inventories(request, token):
+    # returns JSON suitable for GET /init/ endpoint,
+    # also resyncs the inventories on disk with Django's,
+    # state: request.session["directories"]
+
+    request.session["directories"] = []
+
+    for index, inventory in enumerate(INVENTORIES_DIRECTORY.iterdir()):
+        request.session["directories"].append({
+            "name": inventory.name,
+            "id": index
+        })
+
+    return JsonResponse({
+        "directories": request.session["directories"],
+        "token": token
+    }, safe=False)
+
+
 def init(request):
     token = get_token(request)
+
+    # if the directory query param is absent, we should return all
+    # inventories present
     if request.GET.get("directory", None) is None:
-        for i in request.session.get("directories", []):
-            i["created"] = False
-        request.session["directories"] = [{**i, **{"id": index}} for index, i in enumerate(
-            request.session.get("directories", [])) if os.path.isdir(i["path"])]
-        return JsonResponse({
-            "directories": request.session["directories"],
-            "token": token
-        }, safe=False)
+        return get_inventories(request, token)
 
-    
+    return get_inventory(request, token)
 
-    request.session["directory"] = request.GET.get("directory")
+
+def get_inventory(request, token):
+
+    request.session["directory"] = str(get_absolute_inventory_path(request.GET.get("directory")))
 
     node_id = 0
-    task_id = 0
+    batch_id = 0
     test_id = 0
     hosts = []
     groups = []
@@ -836,96 +808,71 @@ def init(request):
     bssid_scans = []
     archivers = []
     tests = []
-    tasks = []
+    batches = []
     testnames = []
     archivernames = []
-    with open(request.session["directory"] + "/hosts", "r") as f:
-        f.seek(0)
+
+    with open(request.session["directory"] + "/hosts.yml", "r") as f:
+        hosts_yml = yaml.safe_load(f)
         group_id = 0
-        seenset = set()
-        for line in f.readlines():
-            if line[0] != '#' and ':' not in line and line != "\n":
+        
+        # gather the global batches into the response
+        with open(request.session["directory"] + "/group_vars/all/batch_definitions.yml", "r") as f:
+            batch_defs_yml = yaml.load(f, Loader=SafeLoader)
+            batches = batch_defs_yml["batches"]
+            for i, batch in enumerate(batches):
+                batch["id"] = i
 
-                if line[0] == '[' and line[-2] == ']':  # if group
-                    currentgroup = line[1:-2]
+        for group, group_content in hosts_yml.items():
 
+            currentgroup = group
 
-                    with open(request.session["directory"] + "/group_vars/" + currentgroup + "/meta.yml", "r") as f:
-                        yamlfile = yaml.load(f, Loader=SafeLoader)
-                        meta = yamlfile["meta"]
-                    with open(request.session["directory"] + "/group_vars/" + currentgroup + "/tasks.yml", "r") as f:
-                        yamlfile = yaml.load(f, Loader=SafeLoader)
-                        new_tasks = [i["name"] for i in yamlfile["tasks"]]
-                    groups.append(
-                        {"name": currentgroup, "nodes": [], "id": group_id, "meta": meta, "tasks": new_tasks})
+            with open(request.session["directory"] + "/group_vars/" + currentgroup + "/meta.yml", "r") as f:
+                group_meta_yml = yaml.load(f, Loader=SafeLoader)
+                meta_key = f"{group}_meta"
+                meta = group_meta_yml[meta_key]
+            with open(request.session["directory"] + "/group_vars/" + currentgroup + "/batches.yml", "r") as f:
+                group_batches_yml = yaml.load(f, Loader=SafeLoader)
+                batches_key = f"{group}_batches"
+                new_batches = group_batches_yml[batches_key]
+            groups.append(
+                {"name": currentgroup, "nodes": [], "id": group_id, "meta": meta, "batches": new_batches})
 
-                    with open(request.session["directory"] + "/group_vars/" + currentgroup + "/tasks.yml", "r") as f:
-                        yamlfile = yaml.load(f, Loader=SafeLoader)
-                        new_tasks = yamlfile["tasks"]
-                        # tasks += [{**{"name": i["name"], "id": task_id}, **
-                                    # i} for i in new_tasks if i["name"] not in [j["name"] for j in tasks]]
-                        # task_id += 1
-                        for i in new_tasks:
-                            if i["name"] not in [j["name"] for j in tasks]:
-                                tasks.append({**{"id": task_id}, **i})
-                                task_id += 1
-                    try:
-                        os.mkdir(
-                            request.session["directory"] + "/group_vars/" + currentgroup)
-                    except FileExistsError as e:
-                        print(e)
-                        print(traceback.format_exc())
+            Path(request.session["directory"] + "/group_vars/" + currentgroup).mkdir(parents=True,exist_ok=True)
 
-                    group_id += 1
+            group_id += 1
 
-                else:  # else host name
-                    if line[:-1] in seenset:
-                        groups[-1]["nodes"].append(line[:-1])
-                    else:
-                        ip = line[:-1]
-                        try:
+            if group_content["hosts"] is None:
+                hosts_entry = {}
+            else:
+                hosts_entry = group_content["hosts"]
 
-                            with open(request.session["directory"] + "/host_vars/"
-                                      + ip + "/pssid_conf.yml", "r") as f:
-                                f.seek(0)
-                                new_node = {}
-                                # try:
-                                    # new_node = yaml.load(f, Loader=SafeLoader)
-                                # except json.decoder.JSONDecodeError:
-                                new_node = yaml.load(f, Loader=SafeLoader)
-                                new_node["id"] = node_id
-                                # tasks += [{**{"name": i, "id": task_id}, **
-                                #            i} for i in new_node["tasks"]]
-                                # task_id += 1
-                                for i in new_node["tasks"]:
-                                    if i["name"] not in [j["name"] for j in tasks]:
-                                        tasks.append({**{"id": task_id}, **i})
-                                        task_id += 1
+            for host in hosts_entry:
+                ip = host
 
-                                # print(new_node)
-                                testnames += [
-                                    {"name": i.split("/")[-1]} for i in new_node["tests"]]
-                                archivernames += [
-                                        {"name": i.split("/")[-1]} for i in new_node["archivers"]]
+                with open(request.session["directory"] + "/host_vars/"
+                            + ip + "/pssid_conf.yml", "r") as f:
+                    f.seek(0)
+                    new_node = {}
 
-                                test_id += 1
-                                new_node["tasks"] = [i["name"] for i in new_node["tasks"]]
-                                
-                                with open(request.session["directory"] + "/host_vars/"
-                                      + ip + "/meta.yml", "r") as f2:
-                                    meta = yaml.load(f2, Loader=SafeLoader)
-                                    meta["meta"] = [i for i in meta["meta"] if i is not None]
-                                    new_node["meta"] = meta["meta"]
-                                    print(new_node)
-                                hosts.append(new_node)
-                        except Exception as e:
-                            print(e)
-                            print(traceback.format_exc())
+                    new_node = yaml.load(f, Loader=SafeLoader)
+                    new_node["id"] = node_id
+                    new_node["batches"] = new_node.pop("host_batches")
 
-                        seenset.add(line[:-1])
-                        # groups[0]["nodes"].append(node_id)
-                        groups[-1]["nodes"].append(line[:-1])
-                        node_id += 1
+                    test_id += 1
+                    
+                    with open(request.session["directory"] + "/host_vars/"
+                            + ip + "/meta.yml", "r") as f2:
+                        meta = yaml.load(f2, Loader=SafeLoader)
+                        new_node["meta"] = meta["host_meta"]
+
+                    # this is to avoid adding the same host from two different groups
+                    # to the same host list multiple times
+                    if all(host_candidate["name"] != new_node["name"] for host_candidate in hosts):
+                        hosts.append(new_node)
+
+                groups[-1]["nodes"].append(host)
+                node_id += 1
 
     with open(request.session["directory"] + "/group_vars/all/schedules.yml") as f:
         f.seek(0)
@@ -984,9 +931,6 @@ def init(request):
 
         for index, i in enumerate(yamlfile):
             i["id"] = index
-            i["nodes"] = i.pop("profiles")
-        # yamlfile = [{"id": index, "name": list(i.keys())[0], "nodes": list(i.values())[
-        #     0]} for index, i in enumerate(yamlfile)]
 
         ssid_groups = yamlfile
 
@@ -1022,17 +966,12 @@ def init(request):
 
         bssid_scans = yamlfile
 
-    request.session["directories"] = [{**i, **{"id": index}} for index, i in enumerate(
-        request.session.get("directories", [])) if os.path.isdir(i["path"])]
+    # this adds the inventories to `request.session["directories"]`
+    get_inventories(request, token)
 
-    # with open("rtt.json") as f:
-    #     rttjson = yaml.load(f, Loader=SafeLoader)
-    #     tests.append({"name": "rtt", "spec": rttjson})
+    with open(request.session["directory"] + "/group_vars/all/jobs.yml", "r") as f:
+        jobs = yaml.load(f, Loader=SafeLoader)["jobs"]
 
-    with open(request.session["directory"] + "/group_vars/all/task_list.yml", "w") as f:
-        # yaml.dump(dict(zip([i["name"] for i in tasks], [
-        #     {i: d[i] for i in d if i != "name"} for d in tasks])), f, indent=2, sort_keys=False)
-        yaml.dump({"tasks": tasks}, f, indent=2, sort_keys=False)
     with open(request.session["directory"] + "/group_vars/all/tests.yml", "r") as f:
         f.seek(0)
         fileread = f.read()
@@ -1067,30 +1006,14 @@ def init(request):
             for extrakey in i["extra"]:
                 i["meta"].append({extrakey: i["spec"][extrakey]})
                 i["spec"].pop(extrakey, None)
-                
-            # i["meta"] = []
-        # yamlfile = [{**{"id": index, "name": list(i.keys())[0]}, **list(i.values())[
-        #     0]} for index, i in enumerate(yamlfile)]
 
         archivers = yamlfile
 
-    with open(request.session["directory"] + "/group_vars/all/testnames.yml", "w") as f:
-        yaml.dump(testnames, f, indent=2, sort_keys=False)
-    with open(request.session["directory"] + "/group_vars/all/archivernames.yml", "w") as f:
-        yaml.dump(archivernames, f, indent=2, sort_keys=False)
-    # try:
-    #     for directory in os.listdir(hostvardir):
-    #         with open(hostvardir + directory + "/pssid_conf.yml") as f:
-    #             yamlfile = yaml.load(f, Loader = SafeLoader)
-    #             for task in yamlfile["tasks"]:
-    #                 tasks.append({**{"name": task}, **yamlfile["tasks"][task]})
-    #     for directory in os.listdir(groupvardir):
-    #         with open(groupvardir + directory + "/tasks.yml") as f:
-    #             yamlfile = yaml.load(f, Loader = SafeLoader)
-    #             for task in yamlfile["tasks"]:
-    #                 tasks.append({**{"name": task}, **yamlfile["tasks"][task]})
-    # except Exception as e:
-    #
+    with open(request.session["directory"] + "/group_vars/all/testnames.yml", "r") as f:
+        testnames = (yaml.load(f, Loader=SafeLoader))["testnames"]
+
+    with open(request.session["directory"] + "/group_vars/all/archivernames.yml", "r") as f:
+        archivernames = (yaml.load(f, Loader=SafeLoader))["archivernames"]
 
     request.session["hosts"] = hosts
     request.session["groups"] = groups
@@ -1101,8 +1024,9 @@ def init(request):
     request.session["network_interfaces"] = network_interfaces
     request.session["bssid_scans"] = bssid_scans
     request.session["archivers"] = archivers
+    request.session["jobs"] = jobs
     request.session["tests"] = tests
-    request.session["tasks"] = tasks
+    request.session["batches"] = batches
     request.session["testnames"] = testnames
     request.session["archivernames"] = archivernames
 
@@ -1119,7 +1043,8 @@ def init(request):
         "bssid_scans": bssid_scans,
         "archivers": archivers,
         "tests": tests,
-        "tasks": tasks,
+        "jobs": jobs,
+        "batches": batches,
         "directories": request.session["directories"],
         "testnames": testnames,
         "archivernames": archivernames,
@@ -1155,10 +1080,12 @@ def submit(request):
         return submit_archiver(request, data, action)
     if tab == "test":
         return submit_test(request, data, action)
-    if tab == "task":
-        return submit_task(request, data, action)
+    if tab == "job":
+        return submit_job(request, data, action)
+    if tab == "batch":
+        return submit_batch(request, data, action)
     if tab == "directory":
-        return submit_directory(request, data, action)
+        return submit_inventory(request, data, action)
     print(tab)
     return False
 

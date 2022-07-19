@@ -40,7 +40,7 @@ DEBUG = True
 # 'DJANGO_ALLOWED_HOSTS' should be a single string of hosts with a space between each.
 # For example: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]'
 # ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
-ALLOWED_HOSTS = ["*", "localhost", "127.0.0.1", "[::1]", gethostname(), gethostbyname(gethostname()), "172.24.0.2", "172.24.0.3","172.24.0.4"]
+ALLOWED_HOSTS = ["*", "localhost", "127.0.0.1", "[::1]", "172.24.0.2", "172.24.0.3", "172.24.0.4"]
 
 # Application definition
 

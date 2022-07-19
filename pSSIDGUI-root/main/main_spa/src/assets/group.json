@@ -24,15 +24,15 @@
     }
     ,
     {
-      "slot": "tasks",
+      "slot": "batches",
       "componentname": "node-picker",
       "props": {
-        "title": "tasks",
+        "title": "batches",
         "listData": ["name", "schedule"],
         "keyname": "name",
-        "label": "Tasks"
+        "label": "Batches"
       },
-      "extraData": {"list": "tasks"}
+      "extraData": {"list": "batches"}
     }
   
 ]

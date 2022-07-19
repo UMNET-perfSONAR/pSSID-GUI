@@ -1,8 +1,11 @@
 <template>
 
   <div>
-    <div style="position: absolute; left: 2em; top: 2em">
-      Directory: {{ directory.path }}
+    <div
+      style="position: absolute; left: 2em; top: 2em"
+      v-if="directory.name"
+    >
+      Selected Inventory: {{ directory.name }}
     </div>
     <div class="col text-center" style="font-size: 50px">pSSID Web GUI</div>
     <hr />
@@ -13,7 +16,7 @@
         <b-tabs fill>
           <b-tab
             :title="pluralize(tab)"
-            :disabled="tab != 'Directory' && directory.path == undefined"
+            :disabled="tab != 'Inventory' && directory.name == undefined"
             v-for="(tab, index) in tablist"
             :key="tab"
             v-on:click="tabHandler(index)"
@@ -23,7 +26,7 @@
               <node-vue
                 v-model="directories"
                 v-if="activeIndex == 0"
-                :listData="['name', 'path']"
+                :listData="['name']"
                 filename="directory"
                 @refresh="refresh"
                 :tab="tab"
@@ -137,10 +140,20 @@
             </div>
             <div v-if="index == 11">
               <node-vue
-                v-model="tasks"
+                v-model="jobs"
                 v-if="activeIndex == 11"
                 :listData="['name']"
-                :filename="'task'"
+                :filename="'job'"
+                @refresh="refresh"
+                :tab="tab"
+              ></node-vue>
+            </div>
+            <div v-if="index == 12">
+              <node-vue
+                v-model="batches"
+                v-if="activeIndex == 12"
+                :listData="['name']"
+                :filename="'batch'"
                 @refresh="refresh"
                 :tab="tab"
               ></node-vue>
@@ -180,7 +193,7 @@ export default Vue.extend({
   data: function () {
     return {
       tablist: [
-        "Directory",
+        "Inventory",
         "Host",
         "Group",
         "Schedule",
@@ -191,7 +204,8 @@ export default Vue.extend({
         "BSSID Scan",
         "Archiver",
         "Test",
-        "Task",
+        "Job",
+        "Batch",
       ],
       activeIndex: 0,
       hosts: [],
@@ -204,7 +218,8 @@ export default Vue.extend({
       bssid_scans: [],
       archivers: [],
       tests: [],
-      tasks: [],
+      jobs: [],
+      batches: [],
       directories: [],
       directory: {path: null, id: null},
       testnames: [],
@@ -215,7 +230,7 @@ export default Vue.extend({
     tabHandler(index) {
       this.activeIndex = index;
     },
-    refresh(directory = this.directory.path) {
+    refresh(directory = this.directory.name) {
       this.$refs.tabs.style.display = "none";
       this.$refs.loader.style.display = "block";
       Vue.axios
@@ -278,7 +293,7 @@ export default Vue.extend({
     },
     directoryHandler(node) {
       this.directory = node;
-      this.refresh(node.path);
+      this.refresh(node.name);
     },
     pluralize(word : String): String{
       return this.$pluralize(word)
@@ -351,12 +366,10 @@ export default Vue.extend({
     hosts: {
       // when a new host is created add it to the all group
       handler(newval, oldval) {
-        if (newval.length == oldval.length + 1) {
-          for (var item of this.groups) {
-            if (item.name == "all") {
-              item.nodes.push(newval[newval.length - 1].ip);
-              return;
-            }
+        for (var item of this.groups) {
+          if (item.name == "all") {
+            item.nodes = newval.map(host => host.ip);
+            return;
           }
         }
       },

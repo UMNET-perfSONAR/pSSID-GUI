@@ -1,0 +1,37 @@
+[
+    {
+        "slot": "name",
+        "componentname": "custom-input",
+        "props": {
+            "title": "name",
+            "placeholder": "Name...",
+            "initvalue": null,
+            "label": "Name"
+        }
+    },
+    {
+        "slot": "tests",
+        "componentname": "node-picker",
+        "props": {
+            "title": "tests",
+            "listData": [
+                "name"
+            ],
+            "keyname": "name",
+            "label": "Test"
+        },
+        "extraData": {
+            "list": "tests"
+        }
+    },
+    {
+        "slot": "continue-if",
+        "componentname": "custom-input",
+        "props": {
+            "title": "continue-if",
+            "initvalue": null,
+            "label": "Continue\u00A0if…",
+            "optional": true
+        }
+    }
+]

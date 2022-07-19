@@ -1,8 +1,0 @@
-#!/bin/bash
-set -e
-npm --prefix pSSIDGUI-root/main/main_spa install
-npm --prefix pSSIDGUI-root/main/main_spa run build -- --mode staging 
-export SECRET_KEY=fjbgskjdfhvg
-python3 pSSIDGUI-root/manage.py collectstatic --no-input
-export DOCKER_BUILDKIT=1
-docker-compose -f docker-compose.yml up -d --force-recreate --build web

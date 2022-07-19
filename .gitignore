@@ -1,9 +1,10 @@
+inventories
+
 .gitold
 *Zone.Identifier
 ## JS
 app.js
 chunk-vendors.js
-package-lock.json
 
 /dist
 /tmp

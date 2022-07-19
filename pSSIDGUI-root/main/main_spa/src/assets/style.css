@@ -8,7 +8,7 @@
     float:left;
 }
 
-#node-list, #group-list, #task-list, #schedule-list{
+#node-list, #group-list, #batch-list, #schedule-list{
     width: 25%;
     margin: 2em;
     margin-top: 2em;
@@ -19,59 +19,59 @@
     word-wrap: break-word;
 }
 
-#node-list, #node-title, #node-search-container, #group-list, #group-title, #group-search-container, #task-list, #task-title, #task-search-container, #schedule-list, #schedule-title, #schedule-search-container{
+#node-list, #node-title, #node-search-container, #group-list, #group-title, #group-search-container, #batch-list, #batch-title, #batch-search-container, #schedule-list, #schedule-title, #schedule-search-container{
     flex: 0 1 auto;
 }
 
 
-.node-search, #group-search, #task-search, #schedule-search{
+.node-search, #group-search, #batch-search, #schedule-search{
     margin-bottom: 5%;
 }
 
-#node-list, #inner-node-list-container, #group-list, #inner-group-list-container, #task-list, #inner-task-list-container, #schedule-list, #inner-schedule-list-container{
+#node-list, #inner-node-list-container, #group-list, #inner-group-list-container, #batch-list, #inner-batch-list-container, #schedule-list, #inner-schedule-list-container{
     flex: 1 1 auto;
     overflow: auto;
 }
 
-#node-button-container, #group-button-container, #task-button-container, #schedule-button-container{
+#node-button-container, #group-button-container, #batch-button-container, #schedule-button-container{
     display: flex;
 }
 
-#add-node-form, #add-group-form, #add-task-form, #add-schedule-form{
+#add-node-form, #add-group-form, #add-batch-form, #add-schedule-form{
     display:flex;
     flex-grow:1;
     margin-bottom: 0%;
     
 }
 
-#refresh-button, #refresh-button-group, #refresh-button-task, #refresh-button-schedule{
-    margin-top: 5%;
+#refresh-button, #refresh-button-group, #refresh-button-batch, #refresh-button-schedule{
+    margin-bottom: 5%;
     width: auto;
     float:right;
 }
 
-#add-node-button, #add-group-button, #add-task-button, #add-schedule-button{
-    margin-top: 5%;
+#add-node-button, #add-group-button, #add-batch-button, #add-schedule-button{
+    margin-bottom: 5%;
     margin-right: 5%;
     float:left;
     flex-grow:1;
     
 }
 
-#add-node-input, #add-group-input, #add-task-input, #add-schedule-input{
+#add-node-input, #add-group-input, #add-batch-input, #add-schedule-input{
     flex: 1 100%;
     margin-top: 5%;
     
 } 
 
-#add-node-confirm, #add-group-confirm, #add-task-confirm, #add-schedule-confirm{
+#add-node-confirm, #add-group-confirm, #add-batch-confirm, #add-schedule-confirm{
     width: auto;
     margin-top: 5%;
     margin-right: 5%;
     
 }
 
-#add-node-cancel, #add-group-cancel, #add-task-cancel, #add-schedule-cancel{
+#add-node-cancel, #add-group-cancel, #add-batch-cancel, #add-schedule-cancel{
     width: auto;
     margin-top: 5%;
 }
@@ -82,7 +82,7 @@
     color: white;
 }
 
-#node-list, #refresh-button, #group-list, #task-list, #schedule-list{
+#node-list, #refresh-button, #group-list, #batch-list, #schedule-list{
     flex: 0 1 auto;
 }
 
@@ -110,7 +110,7 @@
     height: 80vh;
 }
 
-#task-menu{
+#batch-menu{
 width: 20%;
 margin: 2em;
 margin-top: 2em;

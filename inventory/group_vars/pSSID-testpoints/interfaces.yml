@@ -1,5 +1,0 @@
-network_interfaces:
-  - name: "primary_network_interface"
-    interface: "wlan0"
-  - name: "secondary_network_interface"
-    interface: "wlan1"
