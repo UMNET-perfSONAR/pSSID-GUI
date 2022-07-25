@@ -1,10 +1,10 @@
-version: '2'
+version: '3.8'
 
 services:
   web:
-    build: ./pSSIDGUI-root
-    container_name: django
-    command: gunicorn pSSIDGUI.wsgi:application --bind 0.0.0.0:8000
+    build: ./src
+    container_name: pssid-gui
+    command: gunicorn backend.wsgi:application --bind 0.0.0.0:8000
     ports:
       - ${PORT}:8000
     volumes:
