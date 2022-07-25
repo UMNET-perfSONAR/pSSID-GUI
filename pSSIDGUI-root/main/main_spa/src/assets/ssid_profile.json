@@ -20,37 +20,6 @@
         }
     },
     {
-        "slot": "channels",
-        "componentname": "node-picker",
-        "props": {
-            "title": "channels",
-            "listData": ["name"],
-            "keyname": "name",
-            "single": true,
-            "label": "Channel"
-        },
-        "extraData": {
-            "list": "bssid_channels"
-        }
-    },
-    {
-        "slot": "channel_mismatch_warning",
-        "componentname": "checkbox-input",
-        "props": {
-            "title": "channel_mismatch_warning",
-            "label": "Mismatch Warning",
-            "initvalue": null
-        }
-    },
-    {
-        "slot": "channel_mismatch_connect",
-        "componentname": "checkbox-input",
-        "props": {
-            "title": "channel_mismatch_connect",
-            "label": "Mismatch Connect"
-        }
-    },
-    {
         "slot": "min_signal",
         "componentname": "custom-input",
         "props": {
@@ -59,25 +28,6 @@
             "initvalue": null,
             "label": "Min Signal",
             "type": "number"
-        }
-    },
-    {
-        "slot": "min_qualifying",
-        "componentname": "custom-input",
-        "props": {
-            "title": "min_qualifying",
-            "placeholder": "Min Qualifying...",
-            "initvalue": null,
-            "label": "Min Qualifying",
-            "type": "number"
-        }
-    },
-    {
-        "slot": "AuthMethod",
-        "componentname": "auth-method",
-        "props": {
-            "title": "AuthMethod",
-            "initvalue": null
         }
     }
 ]

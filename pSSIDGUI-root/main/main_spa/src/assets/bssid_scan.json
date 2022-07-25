@@ -10,38 +10,11 @@
     },
     {
         "slot": "interface",
-        "componentname": "node-picker",
+        "componentname": "custom-input",
         "props": {
             "title": "interface",
-            "listData": ["name"],
-            "keyname": "name",
-            "single": true,
+            "placeholder": "Interface...",
             "label": "Interface"
-        },
-        "extraData": {
-            "list": "network_interfaces"
-        }
-    },
-    {
-        "slot": "profiles",
-        "componentname": "node-picker",
-        "props": {
-            "title": "profiles",
-            "listData": ["name"],
-            "keyname": "name",
-            "single": true,
-            "label": "SSID Profile"
-        },
-        "extraData": {
-            "list": "ssid_profiles"
-        }
-    },
-    {
-        "slot": "unknown_SSID_warning",
-        "componentname": "checkbox-input",
-        "props": {
-            "title": "unknown_SSID_warning",
-            "label": "Unknown SSID Warning"
         }
     },
     {

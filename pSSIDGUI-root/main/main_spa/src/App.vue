@@ -70,88 +70,58 @@
             </div>
             <div v-if="index == 4">
               <node-vue
-                v-model="bssid_channels"
-                v-if="activeIndex == 4"
-                :listData="['name']"
-                :filename="'bssid_channel'"
-                @refresh="refresh"
-                :tab="tab"
-              ></node-vue>
-            </div>
-            <div v-if="index == 5">
-              <node-vue
                 v-model="ssid_profiles"
-                v-if="activeIndex == 5"
+                v-if="activeIndex == 4"
                 :listData="['name']"
                 :filename="'ssid_profile'"
                 @refresh="refresh"
                 :tab="tab"
               ></node-vue>
             </div>
-            <div v-if="index == 6">
-              <node-vue
-                v-model="ssid_groups"
-                v-if="activeIndex == 6"
-                :listData="['name']"
-                :filename="'ssid_group'"
-                @refresh="refresh"
-                :tab="tab"
-              ></node-vue>
-            </div>
-            <div v-if="index == 7">
-              <node-vue
-                v-model="network_interfaces"
-                v-if="activeIndex == 7"
-                :listData="['name', 'interface']"
-                :filename="'network_interface'"
-                @refresh="refresh"
-                :tab="tab"
-              ></node-vue>
-            </div>
-            <div v-if="index == 8">
+            <div v-if="index == 5">
               <node-vue
                 v-model="bssid_scans"
-                v-if="activeIndex == 8"
+                v-if="activeIndex == 5"
                 :listData="['name']"
                 :filename="'bssid_scan'"
                 @refresh="refresh"
                 :tab="tab"
               ></node-vue>
             </div>
-            <div v-if="index == 9">
+            <div v-if="index == 6">
               <node-vue
                 v-model="archivers"
-                v-if="activeIndex == 9"
+                v-if="activeIndex == 6"
                 :listData="['name']"
                 :filename="'archiver'"
                 @refresh="refresh"
                 :tab="tab"
               ></node-vue>
             </div>
-            <div v-if="index == 10">
+            <div v-if="index == 7">
               <node-vue
                 v-model="tests"
-                v-if="activeIndex == 10"
+                v-if="activeIndex == 7"
                 :listData="['name']"
                 :filename="'test'"
                 @refresh="refresh"
                 :tab="tab"
               ></node-vue>
             </div>
-            <div v-if="index == 11">
+            <div v-if="index == 8">
               <node-vue
                 v-model="jobs"
-                v-if="activeIndex == 11"
+                v-if="activeIndex == 8"
                 :listData="['name']"
                 :filename="'job'"
                 @refresh="refresh"
                 :tab="tab"
               ></node-vue>
             </div>
-            <div v-if="index == 12">
+            <div v-if="index == 9">
               <node-vue
                 v-model="batches"
-                v-if="activeIndex == 12"
+                v-if="activeIndex == 9"
                 :listData="['name']"
                 :filename="'batch'"
                 @refresh="refresh"
@@ -197,10 +167,7 @@ export default Vue.extend({
         "Host",
         "Group",
         "Schedule",
-        "BSSID Channel",
         "SSID Profile",
-        "SSID Group",
-        "Network Interface",
         "BSSID Scan",
         "Archiver",
         "Test",
