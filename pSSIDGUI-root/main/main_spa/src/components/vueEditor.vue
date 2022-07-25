@@ -91,10 +91,8 @@ import formJson from "vue-form-json";
 import customInput from "./inputTypes/customInput.vue";
 import metadataInput from "./inputTypes/metadataInput.vue";
 import cronInput from "./inputTypes/cronInput.vue";
-import channelPicker from "./inputTypes/channelPicker.vue";
 import nodePicker from "./inputTypes/nodePicker.vue";
 import checkboxInput from "./inputTypes/checkboxInput.vue";
-import authMethod from "./inputTypes/authMethod.vue";
 import jsonEditor from "./inputTypes/jsonEditor.vue";
 import { log } from "console";
 
@@ -106,10 +104,8 @@ export default Vue.extend({
     "custom-input": customInput,
     "metadata-input": metadataInput,
     "cron-input": cronInput,
-    "channel-picker": channelPicker,
     "node-picker": nodePicker,
     "checkbox-input": checkboxInput,
-    "auth-method": authMethod,
     "json-editor": jsonEditor,
   },
   props: {

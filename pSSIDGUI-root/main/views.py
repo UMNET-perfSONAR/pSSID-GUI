@@ -300,80 +300,6 @@ def submit_schedule(request, data, action):
         print(e)
         print(traceback.format_exc())
 
-
-def submit_bssid_channel(request, data, action):
-
-    try:
-        name = data["name"]
-        channels = data["channels"]
-        if data.get("id") is None:
-            data["id"] = len(request.session["bssid_channels"])
-        node_id = data.get("id")
-        with open(request.session["directory"] + "/group_vars/all/bssid_channels.yml") as f:
-            yamlfile = yaml.load(f, Loader=SafeLoader)
-            yamlfile = yamlfile["bssid_channels"]
-        if action == "add":
-            for i in request.session["bssid_channels"]:
-                if i["name"] == name:
-                    return HttpResponse(status="503")
-            request.session["bssid_channels"].append(data)
-            # yamlfile[name] = channels
-            yamlfile.append({"name": name, "channels": channels})
-        elif action == "edit":
-            # yamlfile.pop(request.session["bssid_channels"][node_id]["name"])
-            # yamlfile[name] = channels
-            replaceByKeyVal(yamlfile, "name", request.session["bssid_channels"][node_id]["name"], {"name": name, "channels": channels})
-            request.session["bssid_channels"][node_id] = data
-        elif action == "delete":
-            request.session["bssid_channels"].pop(node_id)
-            # yamlfile.pop(name, None)
-            removeByKeyVal(yamlfile, "name", name)
-        with open(request.session["directory"] + "/group_vars/all/bssid_channels.yml", "w") as f:
-            yaml.dump({"bssid_channels": yamlfile}, f, indent=2, sort_keys=False)
-        request.session.modified = True
-        return JsonResponse(data, safe=False)
-    except Exception as e:
-        print(e)
-        print(traceback.format_exc())
-
-
-def submit_network_interface(request, data, action):
-
-    try:
-        name = data["name"]
-        interface = data["interface"]
-        if data.get("id") is None:
-            data["id"] = len(request.session["network_interfaces"])
-        node_id = data.get("id")
-        with open(request.session["directory"] + "/group_vars/all/network_interfaces.yml") as f:
-            yamlfile = yaml.load(f, Loader=SafeLoader)
-            yamlfile = yamlfile["network_interfaces"]
-        if action == "add":
-            for i in request.session["network_interfaces"]:
-                if i["name"] == name:
-                    return HttpResponse(status="503")
-            request.session["network_interfaces"].append(data)
-            # yamlfile[name] = interface
-            yamlfile.append({"name": name, "interface": interface})
-            
-        elif action == "edit":
-            # yamlfile.pop(request.session["network_interfaces"][node_id]["name"])
-            # yamlfile[name] = interface
-            replaceByKeyVal(yamlfile, "name", request.session["network_interfaces"][node_id]["name"], {"name": name, "interface": interface})
-            request.session["network_interfaces"][node_id] = data
-        elif action == "delete":
-            request.session["network_interfaces"].pop(node_id)
-            # yamlfile.pop(name, None)
-            removeByKeyVal(yamlfile, "name", name)
-        with open(request.session["directory"] + "/group_vars/all/network_interfaces.yml", "w") as f:
-            yaml.dump({"network_interfaces": yamlfile}, f, indent=2, sort_keys=False)
-        request.session.modified = True
-        return JsonResponse(data, safe=False)
-    except Exception as e:
-        print(e)
-        print(traceback.format_exc())
-
-
 def submit_ssid_profile(request, data, action):
 
     try:
@@ -410,43 +336,6 @@ def submit_ssid_profile(request, data, action):
     except Exception as e:
         print(e)
         print(traceback.format_exc())
-
-
-def submit_ssid_group(request, data, action):
-
-    try:
-        name = data["name"]
-        # nodes = [request.session["ssid_profiles"][i]["name"] for i in data["nodes"]]
-        nodes = data["nodes"]
-        if data.get("id") is None:
-            data["id"] = len(request.session["ssid_groups"])
-        node_id = data.get("id")
-        with open(request.session["directory"] + "/group_vars/all/ssid_groups.yml") as f:
-            yamlfile = yaml.load(f, Loader=SafeLoader)
-            yamlfile = yamlfile["ssid_groups"]
-        if action == "add":
-            for i in request.session["ssid_groups"]:
-                if i["name"] == name:
-                    return HttpResponse(status="503")
-            request.session["ssid_groups"].append(data)
-            yamlfile.append({"name": name, "nodes": nodes})
-        elif action == "edit":
-            # yamlfile.pop(request.session["ssid_groups"][node_id]["name"])
-            # yamlfile[name] = nodes
-            replaceByKeyVal(yamlfile, "name", request.session["ssid_groups"][node_id]["name"], {"name": name, "profiles": nodes})
-            request.session["ssid_groups"][node_id] = data
-        elif action == "delete":
-            request.session["ssid_groups"].pop(node_id)
-            # yamlfile.pop(name, None)
-            removeByKeyVal(yamlfile, "name", name)
-        with open(request.session["directory"] + "/group_vars/all/ssid_groups.yml", "w") as f:
-            yaml.dump({"ssid_groups": yamlfile}, f, indent=2, sort_keys=False)
-        request.session.modified = True
-        return JsonResponse(data, safe=False)
-    except Exception as e:
-        print(e)
-        print(traceback.format_exc())
-
 
 def submit_bssid_scan(request, data, action):
 
@@ -801,10 +690,7 @@ def get_inventory(request, token):
     hosts = []
     groups = []
     schedules = []
-    bssid_channels = []
     ssid_profiles = []
-    ssid_groups = []
-    network_interfaces = []
     bssid_scans = []
     archivers = []
     tests = []
@@ -888,18 +774,6 @@ def get_inventory(request, token):
         # shh dont tell anyone
 
         schedules = yamlfile
-    with open(request.session["directory"] + "/group_vars/all/bssid_channels.yml") as f:
-        f.seek(0)
-        fileread = f.read()
-        # fileread = '[' + fileread[1:-1] + ']'
-
-        yamlfile = yaml.load(fileread, Loader=SafeLoader)
-
-        yamlfile = yamlfile["bssid_channels"]
-        for index, i in enumerate(yamlfile):
-            i["id"] = index
-
-        bssid_channels = yamlfile
 
     with open(request.session["directory"] + "/group_vars/all/ssid_profiles.yml") as f:
         f.seek(0)
@@ -912,43 +786,7 @@ def get_inventory(request, token):
         for index, i in enumerate(yamlfile):
             i["id"] = index
 
-        # yamlfile = [{**{"id": index, "name": list(i.keys())[0]}, **list(i.values())[
-        #     0]} for index, i in enumerate(yamlfile)]
-        # for i in yamlfile:
-        #     for channel in bssid_channels:
-        #         if channel["name"] == i["channels"]:
-        #             i["channels"] = channel["id"]
-
         ssid_profiles = yamlfile
-
-    with open(request.session["directory"] + "/group_vars/all/ssid_groups.yml") as f:
-        f.seek(0)
-        fileread = f.read()
-        # fileread = '[' + fileread[1:-1] + ']'
-        yamlfile = yaml.load(fileread, Loader=SafeLoader)
-
-        yamlfile = yamlfile["ssid_groups"]
-
-        for index, i in enumerate(yamlfile):
-            i["id"] = index
-
-        ssid_groups = yamlfile
-
-    with open(request.session["directory"] + "/group_vars/all/network_interfaces.yml") as f:
-        f.seek(0)
-        fileread = f.read()
-        # fileread = '[' + fileread[1:-1] + ']'
-        yamlfile = yaml.load(fileread, Loader=SafeLoader)
-
-        yamlfile = yamlfile["network_interfaces"]
-
-        for index, i in enumerate(yamlfile):
-            i["id"] = index
-
-        # yamlfile = [{"id": index, "name": list(i.keys())[0], "interface": list(
-        #     i.values())[0]} for index, i in enumerate(yamlfile)]
-
-        network_interfaces = yamlfile
 
     with open(request.session["directory"] + "/group_vars/all/bssid_scans.yml") as f:
         f.seek(0)
@@ -1018,10 +856,7 @@ def get_inventory(request, token):
     request.session["hosts"] = hosts
     request.session["groups"] = groups
     request.session["schedules"] = schedules
-    request.session["bssid_channels"] = bssid_channels
     request.session["ssid_profiles"] = ssid_profiles
-    request.session["ssid_groups"] = ssid_groups
-    request.session["network_interfaces"] = network_interfaces
     request.session["bssid_scans"] = bssid_scans
     request.session["archivers"] = archivers
     request.session["jobs"] = jobs
@@ -1036,10 +871,7 @@ def get_inventory(request, token):
         "hosts": hosts,
         "groups": groups,
         "schedules": schedules,
-        "bssid_channels": bssid_channels,
         "ssid_profiles": ssid_profiles,
-        "ssid_groups": ssid_groups,
-        "network_interfaces": network_interfaces,
         "bssid_scans": bssid_scans,
         "archivers": archivers,
         "tests": tests,
@@ -1066,14 +898,8 @@ def submit(request):
         return submit_group(request, data, action)
     if tab == "schedule":
         return submit_schedule(request, data, action)
-    if tab == "bssid_channel":
-        return submit_bssid_channel(request, data, action)
     if tab == "ssid_profile":
         return submit_ssid_profile(request, data, action)
-    if tab == "ssid_group":
-        return submit_ssid_group(request, data, action)
-    if tab == "network_interface":
-        return submit_network_interface(request, data, action)
     if tab == "bssid_scan":
         return submit_bssid_scan(request, data, action)
     elif tab == "archiver":
