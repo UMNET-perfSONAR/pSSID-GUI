@@ -5,14 +5,8 @@ services:
     build: ./pSSIDGUI-root
     container_name: django
     command: gunicorn pSSIDGUI.wsgi:application --bind 0.0.0.0:8000
-    expose: [ 8000 ]
+    ports:
+      - ${PORT}:8000
     volumes:
       - ${INV_DIR}:/app/inventories:Z
-  nginx:
-    build: ./nginx
-    volumes_from: 
-      - web
-    ports:
-      - ${PORT}:80
-    depends_on:
-      - web
+
