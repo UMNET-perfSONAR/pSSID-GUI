@@ -1,4 +1,7 @@
-# concatenates all `*_batches`s and mergers all `*.meta`s
+# concatenates all `*_batches`s and mergers all `*_meta`s into
+# `meta` and `batch_selection`
+# this makes it so group and host `meta` and `batches` are
+# included in final config
 
 meta: >-
   {%- set meta={} -%}

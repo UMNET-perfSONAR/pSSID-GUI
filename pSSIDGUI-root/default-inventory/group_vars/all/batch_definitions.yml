@@ -1,1 +1,30 @@
-batches: []
+batches:
+- name: comprehensive-wifi
+  profiles:
+  - MWireless
+  BSSIDs: continual-mwireless
+  jobs:
+  - layer-2-auth
+  - layer-3-auth
+  - all-tests
+  archivers:
+  - elk-stack
+  - syslog
+  schedule:
+  - every-12-hours
+  priority: 1
+  ttl: 180
+- name: throughput-latency-frequent
+  profiles:
+  - MWireless
+  - eduroam
+  BSSIDs: continual-mwireless
+  jobs:
+  - throughput-latency
+  archivers:
+  - elk-stack
+  - syslog
+  schedule:
+  - every-15-minutes
+  priority: 1
+  ttl: 180

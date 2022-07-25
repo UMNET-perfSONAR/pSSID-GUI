@@ -1,1 +1,2 @@
-all_batches: []
+all_batches:
+- throughput-latency-frequent

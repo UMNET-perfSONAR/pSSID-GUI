@@ -1,1 +1,29 @@
-jobs: []
+jobs:
+- name: all-tests
+  tests:
+  - perfsonar.net-cname
+  - google.com-http
+  - umich.edu-latency
+  - fsf.org-mtu
+  - 8.8.8.8-rtt
+  - example.org-trace
+  - layer-2-mwireless-auth
+  - layer-3-mwireless-auth
+  continue-if: 'true'
+  id: 0
+- name: layer-2-auth
+  tests:
+  - layer-2-mwireless-auth
+  continue-if: 'true'
+  id: 1
+- name: layer-3-auth
+  tests:
+  - layer-3-mwireless-auth
+  continue-if: 'true'
+  id: 2
+- name: throughput-latency
+  tests:
+  - umich.edu-latency
+  - throughput
+  continue-if: 'true'
+  id: 3

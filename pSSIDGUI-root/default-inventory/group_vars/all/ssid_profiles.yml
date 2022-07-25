@@ -1,1 +1,7 @@
-ssid_profiles: []
+ssid_profiles:
+- name: eduroam
+  SSID: eduroam
+  min_signal: -75
+- name: MWireless
+  SSID: MWireless
+  min_signal: -98

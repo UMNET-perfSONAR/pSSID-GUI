@@ -1,17 +1,31 @@
 archivers:
-  - name: Rabbit MQ
-    type: rabbitmq
-    spec:
-      _url: "amqp://elastic:elastic@pssid-elk.miserver.it.umich.edu"
-      routing-key: pscheduler_raw
-    extra:
-    - _url
-    - routing-key
-  - name: System Logger
-    type: syslog
-    spec:
-      ident: pSSID22 result
-      facility: local3
-    extra:
-    - ident
-    - facility
+- name: rabbitmq
+  type: rabbitmq
+  extra:
+  - _url
+  - routing-key
+  spec:
+    _url: amqp://elastic:elastic@pssid-elk.miserver.it.umich.edu
+    routing-key: pscheduler_raw
+- name: syslog
+  type: syslog
+  extra:
+  - ident
+  - facility
+  spec:
+    ident: pSSID22 result
+    facility: local3
+- name: esmond
+  type: esmond
+  extra: []
+  spec: {}
+- name: elk-stack
+  type: http
+  extra:
+  - schema
+  - op
+  - _url
+  spec:
+    schema: '2'
+    op: put
+    _url: http://198.111.224.150:5001

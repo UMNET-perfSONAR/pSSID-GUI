@@ -1,0 +1,6 @@
+name: rpi-1
+ip: 198.111.226.183
+status: success
+id: 1
+host_batches:
+- comprehensive-wifi

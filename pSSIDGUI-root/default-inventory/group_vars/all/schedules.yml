@@ -1,3 +1,15 @@
 schedules:
-- name: Julie
-  repeat: 1 2 3 4 5
+- name: hourly-during-school
+  repeat: 0 9-17 * sep-dec,jan-may 1-5
+- name: every-4-hours
+  repeat: 0 */4 * * *
+- name: every-12-hours
+  repeat: 0 0,12 * * *
+- name: every-15-minutes
+  repeat: '*/15 * * * *'
+- name: every-6-hours
+  repeat: 0 */6 * * *
+- name: during-eecs-280
+  repeat: '*/10 12-14 * 9-12,1-5 2,4'
+- name: Fake Sched
+  repeat: '* * * * *'

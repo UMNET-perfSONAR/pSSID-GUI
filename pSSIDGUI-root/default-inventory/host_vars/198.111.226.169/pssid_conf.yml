@@ -1,0 +1,6 @@
+name: rpi-2
+ip: 198.111.226.169
+status: success
+id: 0
+host_batches:
+- throughput-latency-frequent

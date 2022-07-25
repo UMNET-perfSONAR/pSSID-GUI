@@ -1,1 +1,59 @@
-tests: []
+tests:
+- name: perfsonar.net-cname
+  type: dns
+  extra:
+  - query
+  - record
+  spec:
+    query: www.perfsonar.net
+    record: cname
+- name: google.com-http
+  type: http
+  extra:
+  - url
+  spec:
+    url: www.google.com
+- name: umich.edu-latency
+  type: latency
+  extra:
+  - dest
+  spec:
+    dest: www.umich.edu
+- name: fsf.org-mtu
+  type: mtu
+  extra:
+  - dest
+  spec:
+    dest: fsf.org
+- name: 8.8.8.8-rtt
+  type: rtt
+  extra:
+  - dest
+  spec:
+    dest: 8.8.8.8
+- name: example.org-trace
+  type: trace
+  extra:
+  - dest
+  spec:
+    dest: example.org
+- name: layer-2-mwireless-auth
+  type: dot1x
+  extra:
+  - ssid
+  - interface
+  spec:
+    ssid: MWireless
+    interface: wlan0
+- name: layer-3-mwireless-auth
+  type: dhcp
+  extra:
+  - interface
+  spec:
+    interface: wlan0
+- name: throughput
+  type: throughput
+  extra:
+  - dest
+  spec:
+    dest: perfsonar-bin-arbl.umnet.umich.edu
