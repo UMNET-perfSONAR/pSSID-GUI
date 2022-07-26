@@ -2,6 +2,8 @@
 
 A web app for creating Ansible inventories usable by [ansible-playbook-pssid-daemon](https://github.com/UMNET-perfSONAR/ansible-playbook-pssid-daemon) for provisioning Raspberry Pi's running [pSSID](https://github.com/UMNET-perfSONAR/pSSID).
 
+![Demo Image](images/wide-view.png)
+
 ## Building Locally
 
 Install Docker (along with `docker-compose`/`docker compose`). Run
