@@ -1,4 +1,4 @@
-# pSSID-GUI Backend
+# pSSID-GUI Frontend
 
 `src/App.vue` is the homepage/overall page:
 
