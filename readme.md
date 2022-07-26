@@ -26,4 +26,4 @@ Use [ansible-playbook-pssid-gui](https://github.com/UMNET-perfSONAR/ansible-play
 
 ## Documentation
 
-[./docs](./docs)
+See [frontend/readme.md](src/frontend/readme.md) and [backend/readme.md](src/backend/readme.md).
