@@ -13,7 +13,7 @@ COPY frontend .
 RUN npm run build -- --mode staging 
 
 # pull official base image
-FROM python:3.8.3-alpine
+FROM python:3.8.3-alpine as build-backend
 
 # set work directory
 WORKDIR /app
