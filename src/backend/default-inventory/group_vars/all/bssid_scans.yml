@@ -1,14 +1,12 @@
 bssid_scans:
 - name: continual-mwireless
   interface: wlan0
-  profiles: MWireless
   schedule:
   - every-15-minutes
   priority: 0
   meta_information: N/A
 - name: mwireless-eecs-280
   interface: wlan0
-  profiles: MWireless
   schedule:
   - every-15-minutes-eecs-280
   - during-eecs-280
@@ -16,7 +14,6 @@ bssid_scans:
   meta_information: N/A
 - name: eduroam-bidaily
   interface: wlan0
-  profiles: eduroam
   schedule:
   - every-12-hours
   priority: 0
