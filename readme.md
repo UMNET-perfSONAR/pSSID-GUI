@@ -9,13 +9,13 @@ pSSID-GUI is a web app for creating Ansible inventories usable by [ansible-playb
 Install Docker (along with `docker-compose`/`docker compose`). Configure various settings by changing the values in `.env`. Run
 
 ```
-docker compose up
+docker compose up --build
 ```
 
 to build it and run in the foreground. Optionally append ` -d` to run it in the background and use `--env-file` to specify the path to the `.env` file if it is not in `./.env`, like so
 
 ```
-docker compose --env-file /etc/pssid-gui/.env up -d
+docker compose --env-file /etc/pssid-gui/.env up --build -d
 ```
 
 ## Provisioning
