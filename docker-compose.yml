@@ -6,9 +6,10 @@ services:
     container_name: pssid-gui
     command: gunicorn backend.wsgi:application --bind 0.0.0.0:8000
     ports:
-      - ${PORT}:8000
+      - ${PSSID_GUI_PORT}:8000
     volumes:
-      - ${INV_DIR}:/app/inventories:Z
+      - ${PSSID_GUI_INVENTORIES_PATH}:/app/inventories:Z
+      - ${PSSID_GUI_DEFAULT_INVENTORY_PATH}:/app/default-inventory:Z
     dns:
       - 9.9.9.9
       - 8.8.8.8

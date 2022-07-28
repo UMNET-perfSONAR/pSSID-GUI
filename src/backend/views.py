@@ -19,13 +19,10 @@ import yaml
 from yaml.loader import SafeLoader
 from pathlib import Path
 
-DEFAULT_INVENTORY = Path(__file__).parent.joinpath("default-inventory").resolve()
+DEFAULT_INVENTORY = Path(__file__).parent.parent.joinpath("default-inventory").resolve()
 INVENTORIES_DIRECTORY = Path(__file__).parent.parent.joinpath("inventories").resolve()
 
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
-
-# used when making nodes for bootstrap styling
-
 
 def bootstrap_bg(status):
     if status:
