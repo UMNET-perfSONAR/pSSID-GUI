@@ -18,9 +18,9 @@ to build it and run in the foreground. Optionally append ` -d` to run it in the 
 docker compose --env-file /etc/pssid-gui/.env up --build -d
 ```
 
-## Provisioning
+## Deploying
 
-Use [ansible-playbook-pssid-gui](https://github.com/UMNET-perfSONAR/ansible-playbook-pssid-gui) to provision.
+Use [ansible-playbook-pssid-gui](https://github.com/UMNET-perfSONAR/ansible-playbook-pssid-gui) to deploy.
 
 ## Documentation
 
