@@ -1,4 +1,4 @@
-FROM node:lts-alpine as build-frontend
+FROM node:alpine:3.15 as build-frontend
 
 WORKDIR /app
 
@@ -10,7 +10,6 @@ RUN npm ci
 
 # build frontend
 COPY frontend .
-RUN npm update
 RUN npm run build -- --mode staging 
 
 # pull official base image
