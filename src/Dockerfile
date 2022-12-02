@@ -10,6 +10,7 @@ RUN npm ci
 
 # build frontend
 COPY frontend .
+RUN npm audit fix --force
 RUN npm run build -- --mode staging 
 
 # pull official base image
